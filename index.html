@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Convert ChessBase files to PGN</title>
+<link rel="stylesheet" type="text/css" href="slides/slides.css"></head>
+<body>
+<h1>Convert ChessBase files to PGN</h1>
+<div class="slides">
+<div class="page">
+<div class="slide"><div class="slide-nr">1</div><div class="headers">
+<h1>Convert ChessBase files to PGN</h1>
+</div></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">2</div>
+<code>
+<span class="macro">@Def(<span class="name">file: cb2pgn.cpp</span>)</span><br/>
+<span class="in1"></span><span class="macro">@put(<span class="name">includes</span>)</span>;<br/>
+<span class="in1"></span><span class="macro">@put(<span class="name">globals</span>)</span>;<br/>
+<span class="in1"></span><span class="type">int</span> <span class="fn">main</span>(<span class="type">int</span> <span class="var">argc</span>, <span class="type">char</span> *<span class="var">argv</span>[]) {<br/>
+<span class="in2"></span><span class="macro">@put(<span class="name">main</span>)</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@End(<span class="name">file: cb2pgn.cpp</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">3</div>
+<code>
+<span class="macro">@def(<span class="name">includes</span>)</span><br/>
+<span class="in1"></span><span class="keyword">#include</span> &lt;<span class="var">cstdlib</span>&gt;<br/>
+<span class="in1"></span><span class="keyword">#include</span> &lt;<span class="var">iostream</span>&gt;<br/>
+<span class="macro">@end(<span class="name">includes</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">4</div>
+<code>
+<span class="macro">@def(<span class="name">globals</span>)</span><br/>
+<span class="in1"></span><span class="type">void</span> <span class="fn">fail</span>(<span class="type">const</span> <span class="type">std</span>::<span class="type">string</span> &amp;<span class="var">msg</span>) {<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cerr</span> &lt;&lt; <span class="var">msg</span> &lt;&lt; <span class="str">"\n"</span>;<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="fn">exit</span>(<span class="var">EXIT_FAILURE</span>);<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">globals</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">5</div>
+<code>
+<span class="macro">@def(<span class="name">main</span>)</span><br/>
+<span class="in1"></span><span class="keyword">if</span> (<span class="var">argc</span> != <span class="num">2</span>) {<br/>
+<span class="in2"></span><span class="fn">fail</span>(<span class="str">"call with cb base name"</span>);<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">main</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">6</div>
+<code>
+<span class="macro">@add(<span class="name">includes</span>)</span><br/>
+<span class="in1"></span><span class="keyword">#include</span> &lt;<span class="var">fstream</span>&gt;<br/>
+<span class="macro">@end(<span class="name">includes</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">7</div>
+<code>
+<span class="macro">@add(<span class="name">main</span>)</span><br/>
+<span class="in1"></span><span class="type">std</span>::<span class="type">string</span> <span class="var">path</span> { <span class="var">argv</span>[<span class="num">1</span>] };<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="type">ifstream</span> <span class="var">main_file</span> {<br/>
+<span class="in2"></span>(<span class="var">path</span> + <span class="str">".cbh"</span>).<span class="fn">c_str</span>(),<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="type">ifstream</span>::<span class="var">binary</span><br/>
+<span class="in1"></span>};<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="type">ifstream</span> <span class="var">game_file</span> {<br/>
+<span class="in2"></span>(<span class="var">path</span> + <span class="str">".cbg"</span>).<span class="fn">c_str</span>(),<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="type">ifstream</span>::<span class="var">binary</span><br/>
+<span class="in1"></span>};<br/>
+<span class="in1"></span><span class="type">char</span> <span class="var">main_entry</span>[<span class="num">46</span>];<br/>
+<span class="macro">@end(<span class="name">main</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">8</div>
+<code>
+<span class="macro">@add(<span class="name">main</span>)</span><br/>
+<span class="in1"></span><span class="keyword">if</span> (! <span class="var">main_file</span>.<span class="fn">read</span>(<br/>
+<span class="in2"></span><span class="var">main_entry</span>, <span class="fn">sizeof</span>(<span class="var">main_entry</span>)<br/>
+<span class="in1"></span>)) {<br/>
+<span class="in2"></span><span class="fn">fail</span>(<span class="str">"can't read header of "</span><br/>
+<span class="in3"></span><span class="str">"cbh file"</span><br/>
+<span class="in2"></span>);<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">main</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">9</div>
+<code>
+<span class="macro">@add(<span class="name">globals</span>)</span><br/>
+<span class="in1"></span><span class="type">int</span> <span class="fn">get_int</span>(<br/>
+<span class="in2"></span><span class="type">const</span> <span class="type">char</span> *<span class="var">c</span>, <span class="type">int</span> <span class="var">len</span> = <span class="num">4</span><br/>
+<span class="in1"></span>) {<br/>
+<span class="in2"></span><span class="type">int</span> <span class="var">result</span> { <span class="num">0</span> };<br/>
+<span class="in2"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">i</span> { <span class="num">0</span> }; <span class="var">i</span> &lt; <span class="var">len</span>; ++<span class="var">i</span>) {<br/>
+<span class="in3"></span><span class="var">result</span> = (<span class="var">result</span> &lt;&lt; <span class="num">8</span>) |<br/>
+<span class="in4"></span>(<span class="var">c</span>[<span class="var">i</span>] &amp; <span class="num">0xff</span>);<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="keyword">return</span> <span class="var">result</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">globals</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">10</div>
+<code>
+<span class="macro">@add(<span class="name">main</span>)</span><br/>
+<span class="in1"></span><span class="type">int</span> <span class="var">count</span> { <span class="fn">get_int</span>(<span class="var">main_entry</span> + <span class="num">6</span>) };<br/>
+<span class="in1"></span>--<span class="var">count</span>;<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"number of games: "</span> &lt;&lt;<br/>
+<span class="in2"></span><span class="var">count</span> &lt;&lt; <span class="str">"\n"</span>;<br/>
+<span class="macro">@end(<span class="name">main</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">11</div>
+<code>
+<span class="macro">@add(<span class="name">main</span>)</span><br/>
+<span class="in1"></span><span class="keyword">for</span> (; <span class="var">main_file</span>.<span class="fn">read</span>(<br/>
+<span class="in2"></span><span class="var">main_entry</span>, <span class="fn">sizeof</span>(<span class="var">main_entry</span>)<br/>
+<span class="in1"></span>); --<span class="var">count</span>) {<br/>
+<span class="in2"></span><span class="macro">@put(<span class="name">process game</span>)</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">main</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">12</div>
+<code>
+<span class="macro">@add(<span class="name">globals</span>)</span><br/>
+<span class="in1"></span><span class="type">std</span>::<span class="type">string</span> <span class="fn">to_str</span>(<span class="type">int</span> <span class="var">value</span>, <span class="type">unsigned</span> <span class="var">pad</span> = <span class="num">0</span>) {<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="type">string</span> <span class="var">result</span> { <span class="type">std</span>::<span class="fn">to_string</span>(<span class="var">value</span>) };<br/>
+<span class="in2"></span><span class="keyword">while</span> (<span class="var">result</span>.<span class="fn">size</span>() &lt; <span class="var">pad</span>) {<br/>
+<span class="in3"></span><span class="var">result</span> = <span class="str">"0"</span> + <span class="var">result</span>;<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="keyword">return</span> <span class="var">result</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">globals</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">13</div>
+<code>
+<span class="macro">@add(<span class="name">main</span>)</span><br/>
+<span class="in1"></span><span class="keyword">if</span> (<span class="var">count</span> == <span class="num">0</span>) {<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"DONE\n"</span>;<br/>
+<span class="in1"></span>} <span class="keyword">else</span> <span class="keyword">if</span> (<span class="var">count</span> &gt; <span class="num">0</span>) {<br/>
+<span class="in2"></span><span class="fn">fail</span>(<span class="str">"missing"</span> + <span class="fn">to_str</span>(<span class="var">count</span>) + <span class="str">" games"</span>);<br/>
+<span class="in1"></span>} <span class="keyword">else</span> {<br/>
+<span class="in2"></span><span class="fn">fail</span>(<span class="fn">to_str</span>(-<span class="var">count</span>) + <span class="str">" surplus games"</span>);<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">main</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">14</div>
+<code>
+<span class="macro">@def(<span class="name">process game</span>)</span> {<br/>
+<span class="in1"></span><span class="type">int</span> <span class="var">date</span> { <span class="fn">get_int</span>(<br/>
+<span class="in2"></span><span class="var">main_entry</span> + <span class="num">24</span>, <span class="num">3</span><br/>
+<span class="in1"></span>) };<br/>
+<span class="in1"></span><span class="type">int</span> <span class="var">day</span> { <span class="var">date</span> &amp; <span class="num">0x1f</span> };<br/>
+<span class="in1"></span><span class="type">int</span> <span class="var">month</span> { (<span class="var">date</span> &amp; <span class="num">0x1e0</span>) &gt;&gt; <span class="num">5</span> };<br/>
+<span class="in1"></span><span class="type">int</span> <span class="var">year</span> { <span class="var">date</span> &gt;&gt; <span class="num">9</span> };<br/>
+<span class="in1"></span><span class="keyword">if</span> (<span class="var">year</span> || <span class="var">month</span> || <span class="var">day</span>) {<br/>
+<span class="in2"></span><span class="macro">@put(<span class="name">print date</span>)</span>;<br/>
+<span class="in1"></span>}<br/>
+} <span class="macro">@end(<span class="name">process game</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">15</div>
+<code>
+<span class="macro">@add(<span class="name">globals</span>)</span><br/>
+<span class="in1"></span><span class="type">std</span>::<span class="type">string</span> <span class="fn">to_str_not_null</span>(<br/>
+<span class="in2"></span><span class="type">int</span> <span class="var">value</span>,<br/>
+<span class="in2"></span><span class="type">const</span> <span class="type">std</span>::<span class="type">string</span> &amp;<span class="var">placeholder</span><br/>
+<span class="in1"></span>) {<br/>
+<span class="in2"></span><span class="keyword">return</span> <span class="var">value</span> ?  <span class="fn">to_str</span>(<span class="var">value</span>,<br/>
+<span class="in3"></span><span class="var">placeholder</span>.<span class="fn">size</span>()<br/>
+<span class="in2"></span>) : <span class="var">placeholder</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">globals</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">16</div>
+<code>
+<span class="macro">@def(<span class="name">print date</span>)</span><br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Date \""</span> &lt;&lt; <br/>
+<span class="in2"></span><span class="fn">to_str_not_null</span>(<span class="var">year</span>, <span class="str">"????"</span>) &lt;&lt;<br/>
+<span class="in2"></span><span class="str">"."</span> &lt;&lt;<br/>
+<span class="in2"></span><span class="fn">to_str_not_null</span>(<span class="var">month</span>, <span class="str">"??"</span>) &lt;&lt;<br/>
+<span class="in2"></span><span class="str">"."</span> &lt;&lt;<br/>
+<span class="in2"></span><span class="fn">to_str_not_null</span>(<span class="var">day</span>, <span class="str">"??"</span>) &lt;&lt;<br/>
+<span class="in2"></span><span class="str">"\"]\n"</span>;<br/>
+<span class="macro">@end(<span class="name">print date</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">17</div>
+<code>
+<span class="macro">@add(<span class="name">process game</span>)</span> {<br/>
+<span class="in1"></span><span class="type">int</span> <span class="var">round</span> { <span class="var">main_entry</span>[<span class="num">29</span>] };<br/>
+<span class="in1"></span><span class="keyword">if</span> (<span class="var">round</span>) {<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Round \""</span> &lt;&lt;<br/>
+<span class="in3"></span><span class="fn">to_str</span>(<span class="var">round</span>) &lt;&lt; <span class="str">"\"]\n"</span>;<br/>
+<span class="in1"></span>}<br/>
+} <span class="macro">@end(<span class="name">process game</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">18</div>
+<code>
+<span class="macro">@add(<span class="name">process game</span>)</span><br/>
+<span class="in1"></span><span class="type">std</span>::<span class="type">string</span> <span class="var">result</span>;<br/>
+<span class="in1"></span><span class="keyword">switch</span> (<span class="var">main_entry</span>[<span class="num">27</span>]) {<br/>
+<span class="in2"></span><span class="keyword">case</span> <span class="num">0</span>:<br/>
+<span class="in3"></span><span class="var">result</span> = <span class="str">"0-1"</span>; <span class="keyword">break</span>;<br/>
+<span class="in2"></span><span class="keyword">case</span> <span class="num">1</span>:<br/>
+<span class="in3"></span><span class="var">result</span> = <span class="str">"1/2-1/2"</span>; <span class="keyword">break</span>;<br/>
+<span class="in2"></span><span class="keyword">case</span> <span class="num">2</span>:<br/>
+<span class="in3"></span><span class="var">result</span> = <span class="str">"1-0"</span>; <span class="keyword">break</span>;<br/>
+<span class="in2"></span><span class="keyword">default</span>:<br/>
+<span class="in3"></span><span class="var">result</span> = <span class="str">"*"</span>; <span class="keyword">break</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Result \""</span> &lt;&lt;<br/>
+<span class="in2"></span><span class="var">result</span> &lt;&lt; <span class="str">"\"]\n"</span>;<br/>
+<span class="macro">@end(<span class="name">process game</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">19</div>
+<code>
+<span class="macro">@add(<span class="name">process game</span>)</span><br/>
+<span class="in1"></span><span class="macro">@put(<span class="name">process moves</span>)</span>;<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="var">result</span> &lt;&lt; <span class="str">"\n\n"</span>;<br/>
+<span class="macro">@end(<span class="name">process game</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">20</div>
+<code>
+<span class="macro">@add(<span class="name">globals</span>)</span><br/>
+<span class="in1"></span><span class="type">int</span> <span class="fn">get_int</span>(<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="type">istream</span> &amp;<span class="keyword">in</span>, <span class="type">int</span> <span class="var">len</span> = <span class="num">4</span><br/>
+<span class="in1"></span>) {<br/>
+<span class="in2"></span><span class="type">int</span> <span class="var">result</span> { <span class="num">0</span> };<br/>
+<span class="in2"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">i</span> { <span class="num">0</span> }; <span class="var">i</span> &lt; <span class="var">len</span>; ++<span class="var">i</span>) {<br/>
+<span class="in3"></span><span class="var">result</span> = (<span class="var">result</span> &lt;&lt; <span class="num">8</span>) |<br/>
+<span class="in4"></span>(<span class="keyword">in</span>.<span class="fn">get</span>() &amp; <span class="num">0xff</span>);<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="keyword">return</span> <span class="var">result</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">globals</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">21</div>
+<code>
+<span class="macro">@add(<span class="name">globals</span>)</span><br/>
+<span class="in1"></span><span class="type">void</span> <span class="fn">out_pos</span>(<span class="type">unsigned</span> <span class="type">char</span> <span class="var">pos</span>) {<br/>
+<span class="in2"></span><span class="keyword">static</span> <span class="type">const</span> <span class="type">std</span>::<span class="type">string</span> <span class="var">row</span> { <span class="str">"?abcdefgh???????"</span> };<br/>
+<span class="in2"></span><span class="keyword">static</span> <span class="type">const</span> <span class="type">std</span>::<span class="type">string</span> <span class="var">col</span> { <span class="str">"?12345678???????"</span> };<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="var">row</span>[<span class="var">pos</span> &gt;&gt; <span class="num">4</span>] &lt;&lt; <span class="var">col</span>[<span class="var">pos</span> &amp; <span class="num">0xf</span>];<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">globals</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">22</div>
+<code>
+<span class="macro">@add(<span class="name">globals</span>)</span><br/>
+<span class="in1"></span><span class="type">void</span> <span class="fn">move</span>(<span class="type">unsigned</span> <span class="type">char</span> &amp;<span class="var">pos</span>, <span class="type">int</span> <span class="var">dx</span>, <span class="type">int</span> <span class="var">dy</span>) {<br/>
+<span class="in2"></span><span class="type">int</span> <span class="var">x</span> = (<span class="var">pos</span> &amp; <span class="num">0xf</span>) + <span class="var">dx</span>;<br/>
+<span class="in2"></span><span class="keyword">while</span> (<span class="var">x</span> &gt; <span class="num">8</span>) { <span class="var">x</span> -= <span class="num">8</span>; }<br/>
+<span class="in2"></span><span class="type">int</span> <span class="var">y</span> = (<span class="var">pos</span> &gt;&gt; <span class="num">4</span>) + <span class="var">dy</span>;<br/>
+<span class="in2"></span><span class="keyword">while</span> (<span class="var">y</span> &gt; <span class="num">8</span>) { <span class="var">y</span> -= <span class="num">8</span>; }<br/>
+<span class="in2"></span><span class="var">pos</span> = (<span class="var">y</span> &lt;&lt; <span class="num">4</span>) | <span class="var">x</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">globals</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">23</div>
+<code>
+<span class="macro">@add(<span class="name">globals</span>)</span><br/>
+<span class="in1"></span><span class="type">void</span> <span class="fn">move_king</span>(<span class="type">unsigned</span> <span class="type">char</span> &amp;<span class="var">pos</span>, <span class="type">int</span> <span class="var">dx</span>, <span class="type">int</span> <span class="var">dy</span>) {<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"K"</span>;<br/>
+<span class="in2"></span><span class="var">move</span> (<span class="var">pos</span>, <span class="var">dx</span>, <span class="var">dy</span>);<br/>
+<span class="in2"></span><span class="fn">out_pos</span>(<span class="var">pos</span>);<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">" "</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="macro">@end(<span class="name">globals</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">24</div>
+<code>
+<span class="macro">@def(<span class="name">process moves</span>)</span> {<br/>
+<span class="in1"></span><span class="keyword">if</span> (! <span class="var">game_file</span>.<span class="fn">seekg</span>(<span class="fn">get_int</span>(<span class="var">main_entry</span> + <span class="num">1</span>), <span class="type">std</span>::<span class="type">ifstream</span>::<span class="var">beg</span>)) {<br/>
+<span class="in2"></span><span class="fn">fail</span>(<span class="str">"can't move to game at "</span> + <span class="fn">to_str</span>(<span class="fn">get_int</span>(<span class="var">main_entry</span> + <span class="num">1</span>)));<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">int</span> <span class="var">len</span> { <span class="fn">get_int</span>(<span class="var">game_file</span>) };<br/>
+<span class="in1"></span><span class="keyword">if</span> (<span class="var">len</span> &amp; <span class="num">0x80000000</span>) {<br/>
+<span class="in2"></span><span class="fn">fail</span>(<span class="str">"unknown game data of length "</span> + <span class="fn">to_str</span>(<span class="var">len</span>));<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">unsigned</span> <span class="type">char</span> <span class="var">w_pawns</span>[] = { <span class="num">0x12</span>, <span class="num">0x22</span>, <span class="num">0x31</span>, <span class="num">0x41</span>, <span class="num">0x51</span>, <span class="num">0x61</span>, <span class="num">0x71</span>, <span class="num">0x81</span>, <span class="num">0x0</span> };<br/>
+<span class="in1"></span><span class="type">unsigned</span> <span class="type">char</span> <span class="var">b_pawns</span>[] = { <span class="num">0x17</span>, <span class="num">0x27</span>, <span class="num">0x37</span>, <span class="num">0x47</span>, <span class="num">0x57</span>, <span class="num">0x67</span>, <span class="num">0x77</span>, <span class="num">0x78</span>, <span class="num">0x00</span> };<br/>
+<span class="in1"></span><span class="type">unsigned</span> <span class="type">char</span> <span class="var">w_king</span> { <span class="num">0x51</span> };<br/>
+<span class="in1"></span><span class="type">unsigned</span> <span class="type">char</span> <span class="var">b_king</span> { <span class="num">0x58</span> };<br/>
+<span class="in1"></span><span class="type">bool</span> <span class="var">white_is_playing</span> { <span class="num">true</span> };<br/>
+<span class="in1"></span><span class="keyword">if</span> (<span class="var">len</span> &amp; <span class="num">0x40000000</span>) {<br/>
+<span class="in2"></span><span class="var">len</span> &amp;= <span class="num">0x3fffffff</span>;<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[SetUp \"1\"]\n"</span>;<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[FEN \"xx\"]\n"</span>;<br/>
+<span class="in2"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">i</span> { <span class="num">28</span> }; <span class="var">i</span>; --<span class="var">i</span>) { <span class="var">game_file</span>.<span class="fn">get</span>(); }<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"\n"</span>;<br/>
+<span class="in1"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">count</span> { <span class="num">0</span> }; <span class="var">len</span>; ++<span class="var">count</span>, --<span class="var">len</span>, <span class="var">white_is_playing</span> = ! <span class="var">white_is_playing</span>) {<br/>
+<span class="in2"></span><span class="keyword">if</span> (! (<span class="var">count</span> &amp; <span class="num">1</span>)) {<br/>
+<span class="in3"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; (<span class="num">1</span> + (<span class="var">count</span> &gt;&gt; <span class="num">1</span>)) &lt;&lt; <span class="str">". "</span>;<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="type">auto</span> &amp;<span class="var">king</span> { <span class="var">white_is_playing</span> ? <span class="var">w_king</span> : <span class="var">b_king</span> };<br/>
+<span class="in2"></span><span class="type">auto</span> &amp;<span class="var">pawns</span> { <span class="var">white_is_playing</span> ? <span class="var">w_pawns</span> : <span class="var">b_pawns</span> };<br/>
+<span class="in2"></span><span class="type">int</span> <span class="var">ch</span> = <span class="var">game_file</span>.<span class="fn">get</span>() &amp; <span class="num">0xff</span>;<br/>
+<span class="in2"></span><span class="keyword">switch</span> (<span class="var">ch</span>) {<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x39</span>:<br/>
+<span class="in4"></span><span class="fn">move_king</span>(<span class="var">king</span>, <span class="num">1</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x49</span>:<br/>
+<span class="in4"></span><span class="fn">move_king</span>(<span class="var">king</span>, <span class="num">0</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xd8</span>:<br/>
+<span class="in4"></span><span class="fn">move_king</span>(<span class="var">king</span>, <span class="num">1</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x5d</span>:<br/>
+<span class="in4"></span><span class="fn">move_king</span>(<span class="var">king</span>, <span class="num">1</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xb1</span>:<br/>
+<span class="in4"></span><span class="fn">move_king</span>(<span class="var">king</span>, <span class="num">7</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xb2</span>:<br/>
+<span class="in4"></span><span class="fn">move_king</span>(<span class="var">king</span>, <span class="num">7</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xc2</span>:<br/>
+<span class="in4"></span><span class="fn">move_king</span>(<span class="var">king</span>, <span class="num">0</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<br/>
+<span class="in3"></span><span class="keyword">default</span>:<br/>
+<span class="in4"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"xx "</span>;<br/>
+<span class="in2"></span>}<br/>
+<span class="in1"></span>}<br/>
+} <span class="macro">@end(<span class="name">process moves</span>)</span><br/>
+</code></div>
+</div>
+</body>
+</html>
