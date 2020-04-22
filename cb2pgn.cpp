@@ -89,22 +89,34 @@
 #line 240 "index.md"
 
 	void move_king(unsigned char &pos, int dx, int dy) {
+		if (! pos) { fail("no king to move"); }
 		std::cout << "K";
 		move (pos, dx, dy);
 		out_pos(pos);
 		std::cout << " ";
 	}
 
-#line 251 "index.md"
+#line 252 "index.md"
 
 	void move_queen(unsigned char &pos, int dx, int dy) {
+		if (! pos) { fail("no queen to move"); }
 		std::cout << "Q";
 		move (pos, dx, dy);
 		out_pos(pos);
 		std::cout << " ";
 	}
 
-#line 262 "index.md"
+#line 264 "index.md"
+
+	void move_rook(unsigned char &pos, int dx, int dy) {
+		if (! pos) { fail("no rook to move"); }
+		std::cout << "R";
+		move (pos, dx, dy);
+		out_pos(pos);
+		std::cout << " ";
+	}
+
+#line 276 "index.md"
 
 	void kingside_rochade(unsigned char &king, unsigned char *rooks) {
 		unsigned char *rook { nullptr };
@@ -123,7 +135,7 @@
 		std::cout << "O-O ";
 	}
 
-#line 283 "index.md"
+#line 297 "index.md"
 
 	void queenside_rochade(unsigned char &king, unsigned char *rooks) {
 		unsigned char *rook { nullptr };
@@ -239,7 +251,7 @@
 #line 196 "index.md"
 
 	
-#line 304 "index.md"
+#line 318 "index.md"
  {
 	if (! game_file.seekg(get_int(main_entry + 1), std::ifstream::beg)) {
 		fail("can't move to game at " + to_str(get_int(main_entry + 1)));
@@ -274,6 +286,12 @@
 		auto &queens { white_is_playing ? w_queens : b_queens };
 		int ch = (game_file.get() - count) & 0xff;
 		switch (ch) {
+			case 0x05:
+				move_rook(rooks[1], 2, 0);
+				break;
+			case 0x14:
+				move_rook(rooks[1], 0, 1);
+				break;
 			case 0x18:
 				move_queen(queens[0], 7, 1);
 				break;
@@ -283,13 +301,29 @@
 			case 0x24:
 				move_queen(queens[0], 6, 6);
 				break;
+			case 0x26:
+				move_rook(rooks[0], 3, 0);
+				break;
 			case 0x28:
 				move_queen(queens[0], 3, 5);
 				break;
+			case 0x2e:
+				move_rook(rooks[0], 1, 0);
+				break;
 			case 0x2f:
 				move_queen(queens[0], 5, 3);
+				break;
+			case 0x30:
+				move_rook(rooks[0], 5, 0);
+				break;
+			case 0x32:
+				move_rook(rooks[1], 6, 0);
+				break;
 			case 0x39:
 				move_king(king, 1, 1);
+				break;
+			case 0x43:
+				move_rook(rooks[0], 0, 3);
 				break;
 			case 0x47:
 				move_king(king, 7, 1);
@@ -303,6 +337,12 @@
 			case 0x4d:
 				move_queen(queens[0], 1, 1);
 				break;
+			case 0x4e:
+				move_rook(rooks[0], 0, 1);
+				break;
+			case 0x52:
+				move_rook(rooks[1], 7, 0);
+				break;
 			case 0x53:
 				move_queen(queens[0], 0, 4);
 				break;
@@ -315,8 +355,17 @@
 			case 0x5d:
 				move_king(king, 1, 7);
 				break;
+			case 0x61:
+				move_rook(rooks[0], 6, 0);
+				break;
 			case 0x62:
 				move_queen(queens[0], 4, 4);
+				break;
+			case 0x63:
+				move_rook(rooks[0], 0, 5);
+				break;
+			case 0x68:
+				move_rook(rooks[1], 0, 3);
 				break;
 			case 0x6b:
 				move_queen(queens[0], 0, 6);
@@ -324,8 +373,14 @@
 			case 0x6e:
 				move_queen(queens[0], 4, 4);
 				break;
+			case 0x6f:
+				move_rook(rooks[0], 7, 0);
+				break;
 			case 0x76:
 				kingside_rochade(king, rooks);
+				break;
+			case 0x77:
+				move_rook(rooks[1], 0, 6);
 				break;
 			case 0x79:
 				move_queen(queens[0], 1, 0);
@@ -333,20 +388,41 @@
 			case 0x7f:
 				move_queen(queens[0], 0, 5);
 				break;
+			case 0x88:
+				move_rook(rooks[0], 4, 0);
+				break;
+			case 0x8b:
+				move_rook(rooks[1], 3, 0);
+				break;
 			case 0x8d:
 				move_queen(queens[0], 0, 7);
 				break;
 			case 0x96:
 				move_queen(queens[0], 7, 7);
 				break;
+			case 0x98:
+				move_rook(rooks[1], 5, 0);
+				break;
 			case 0x99:
 				move_queen(queens[0], 5, 0);
+				break;
+			case 0x9c:
+				move_queen(rooks[0], 0, 6);
+				break;
+			case 0xa1:
+				move_rook(rooks[1], 4, 0);
 				break;
 			case 0xa5:
 				move_queen(queens[0], 0, 1);
 				break;
+			case 0xa6:
+				move_rook(rooks[1], 1, 0);
+				break;
 			case 0xa7:
 				move_queen(queens[0], 1, 7);
+				break;
+			case 0xa9:
+				move_rook(rooks[1], 0, 2);
 				break;
 			case 0xb1:
 				move_king(king, 7, 7);
@@ -375,19 +451,39 @@
 			case 0xc2:
 				move_king(king, 0, 7);
 				break;
+			case 0xc6:
+				move_rook(rooks[0], 2, 0);
+				break;
 			case 0xcb:
 				move_queen(queens[0], 0, 3);
 				break;
 			case 0xd2:
 				move_queen(queens[0], 0, 6);
 				break;
+			case 0xd7:
+				move_rook(rooks[0], 0, 4);
+				break;
 			case 0xd8:
 				move_king(king, 1, 0);
+				break;
+			case 0xe2:
+				move_rook(rooks[1], 0, 7);
+				break;
+			case 0xe6:
+				move_rook(rooks[0], 0, 7);
 				break;
 			case 0xeb:
 				move_queen(queens[0], 3, 0);
 				break;
-
+			case 0xee:
+				move_rook(rooks[1], 0, 4);
+				break;
+			case 0xf8:
+				move_rook(rooks[0], 0, 2);
+				break;
+			case 0xfb:
+				move_rook(rooks[1], 0, 5);
+				break;
 			default:
 				std::cout << "xx ";
 		}
