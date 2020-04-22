@@ -95,6 +95,53 @@
 		std::cout << " ";
 	}
 
+#line 251 "index.md"
+
+	void move_queen(unsigned char &pos, int dx, int dy) {
+		std::cout << "Q";
+		move (pos, dx, dy);
+		out_pos(pos);
+		std::cout << " ";
+	}
+
+#line 262 "index.md"
+
+	void kingside_rochade(unsigned char &king, unsigned char *rooks) {
+		unsigned char *rook { nullptr };
+		for (; *rooks; ++rooks) {
+			if ((*rooks & 0xf) == (king & 0xf) && (*rooks & 0xf0) > (king & 0xf0)) {
+				if (! rook || (*rook & 0xf0) > (*rooks & 0xf0)) {
+					rook = rooks;
+				}
+			}
+		}
+		if (! rook) {
+			fail("no kingside rook found");
+		}
+		*rook = king + 0x10;
+		king = *rook + 0x10;
+		std::cout << "O-O ";
+	}
+
+#line 283 "index.md"
+
+	void queenside_rochade(unsigned char &king, unsigned char *rooks) {
+		unsigned char *rook { nullptr };
+		for (; *rooks; ++rooks) {
+			if ((*rooks & 0xf) == (king & 0xf) && (*rooks & 0xf0) < (king & 0xf0)) {
+				if (! rook || (*rook & 0xf0) < (*rooks & 0xf0)) {
+					rook = rooks;
+				}
+			}
+		}
+		if (! rook) {
+			fail("no queenside rook found");
+		}
+		*rook = king - 0x10;
+		king = *rook - 0x10;
+		std::cout << "O-O-O ";
+	}
+
 #line 6 "index.md"
 ;
 	int main(int argc, char *argv[]) {
@@ -192,7 +239,7 @@
 #line 196 "index.md"
 
 	
-#line 251 "index.md"
+#line 304 "index.md"
  {
 	if (! game_file.seekg(get_int(main_entry + 1), std::ifstream::beg)) {
 		fail("can't move to game at " + to_str(get_int(main_entry + 1)));
@@ -201,10 +248,14 @@
 	if (len & 0x80000000) {
 		fail("unknown game data of length " + to_str(len));
 	}
-	unsigned char w_pawns[] = { 0x12, 0x22, 0x31, 0x41, 0x51, 0x61, 0x71, 0x81, 0x0 };
-	unsigned char b_pawns[] = { 0x17, 0x27, 0x37, 0x47, 0x57, 0x67, 0x77, 0x78, 0x00 };
+	unsigned char w_pawns[] = { 0x12, 0x22, 0x32, 0x42, 0x52, 0x62, 0x72, 0x82, 0x00 };
+	unsigned char b_pawns[] = { 0x17, 0x27, 0x37, 0x47, 0x57, 0x67, 0x77, 0x87, 0x00 };
 	unsigned char w_king { 0x51 };
 	unsigned char b_king { 0x58 };
+	unsigned char w_rooks[] = { 0x11, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char b_rooks[] = { 0x18, 0x88, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char w_queens[] = { 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	unsigned char b_queens[] = { 0x48, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 	bool white_is_playing { true };
 	if (len & 0x40000000) {
 		len &= 0x3fffffff;
@@ -219,19 +270,83 @@
 		}
 		auto &king { white_is_playing ? w_king : b_king };
 		auto &pawns { white_is_playing ? w_pawns : b_pawns };
-		int ch = game_file.get() & 0xff;
+		auto &rooks { white_is_playing ? w_rooks : b_rooks };
+		auto &queens { white_is_playing ? w_queens : b_queens };
+		int ch = (game_file.get() - count) & 0xff;
 		switch (ch) {
+			case 0x18:
+				move_queen(queens[0], 7, 1);
+				break;
+			case 0x21:
+				move_queen(queens[0], 4, 0);
+				break;
+			case 0x24:
+				move_queen(queens[0], 6, 6);
+				break;
+			case 0x28:
+				move_queen(queens[0], 3, 5);
+				break;
+			case 0x2f:
+				move_queen(queens[0], 5, 3);
 			case 0x39:
 				move_king(king, 1, 1);
+				break;
+			case 0x47:
+				move_king(king, 7, 1);
+				break;
+			case 0x48:
+				move_queen(queens[0], 2, 6);
 				break;
 			case 0x49:
 				move_king(king, 0, 1);
 				break;
-			case 0xd8:
-				move_king(king, 1, 0);
+			case 0x4d:
+				move_queen(queens[0], 1, 1);
+				break;
+			case 0x53:
+				move_queen(queens[0], 0, 4);
+				break;
+			case 0x57:
+				move_queen(queens[0], 7, 0);
+				break;
+			case 0x5a:
+				move_queen(queens[0], 6, 2);
 				break;
 			case 0x5d:
 				move_king(king, 1, 7);
+				break;
+			case 0x62:
+				move_queen(queens[0], 4, 4);
+				break;
+			case 0x6b:
+				move_queen(queens[0], 0, 6);
+				break;
+			case 0x6e:
+				move_queen(queens[0], 4, 4);
+				break;
+			case 0x76:
+				kingside_rochade(king, rooks);
+				break;
+			case 0x79:
+				move_queen(queens[0], 1, 0);
+				break;
+			case 0x7f:
+				move_queen(queens[0], 0, 5);
+				break;
+			case 0x8d:
+				move_queen(queens[0], 0, 7);
+				break;
+			case 0x96:
+				move_queen(queens[0], 7, 7);
+				break;
+			case 0x99:
+				move_queen(queens[0], 5, 0);
+				break;
+			case 0xa5:
+				move_queen(queens[0], 0, 1);
+				break;
+			case 0xa7:
+				move_queen(queens[0], 1, 7);
 				break;
 			case 0xb1:
 				move_king(king, 7, 7);
@@ -239,8 +354,38 @@
 			case 0xb2:
 				move_king(king, 7, 0);
 				break;
+			case 0xb4:
+				move_queen(queens[0], 2, 2);
+				break;
+			case 0xb5:
+				queenside_rochade(king, rooks);
+				break;
+			case 0xb8:
+				move_queen(queens[0], 0, 2);
+				break;
+			case 0xbd:
+				move_queen(queens[0], 5, 5);
+				break;
+			case 0xbe:
+				move_queen(queens[0], 2, 0);
+				break;
+			case 0xbf:
+				move_queen(queens[0], 3, 3);
+				break;
 			case 0xc2:
 				move_king(king, 0, 7);
+				break;
+			case 0xcb:
+				move_queen(queens[0], 0, 3);
+				break;
+			case 0xd2:
+				move_queen(queens[0], 0, 6);
+				break;
+			case 0xd8:
+				move_king(king, 1, 0);
+				break;
+			case 0xeb:
+				move_queen(queens[0], 3, 0);
 				break;
 
 			default:
