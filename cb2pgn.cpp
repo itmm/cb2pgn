@@ -166,6 +166,12 @@
 			if (pos == *this) { return this; };
 			return next() ? next()->find(pos) : nullptr;
 		}
+		bool any_attacks(Board &brd, const Piece &p) {
+			if (can_move_to(brd, p)) {
+				return true;
+			}
+			return next() ? next()->any_attacks(brd, p) : false;
+		}
 	};
 
 	struct Side {
@@ -188,6 +194,21 @@
 			if (r) { return r; }
 			r = pawns.get() ? pawns.get()->find(pos) : nullptr;
 			return r;
+		}
+		bool any_attacks(Board &brd, const Piece &p) {
+			if (queens && queens->any_attacks(brd, p)) {
+				return true;
+			}
+			if (rooks && rooks->any_attacks(brd, p)) {
+				return true;
+			}
+			if (bishops && bishops->any_attacks(brd, p)) {
+				return true;
+			}
+			if (knights && knights->any_attacks(brd, p)) {
+				return true;
+			}
+			return pawns->any_attacks(brd, p);
 		}
 		bool remove_inner(Piece *p, Piece *prev) {
 			while (prev) {
@@ -269,7 +290,9 @@
 		}
 		bool white() const { return &white_ == cur_; }
 		bool mate() const { return false; }
-		bool check() const { return false; }
+		bool check() { 
+			return cur_->any_attacks(*this, *other_->king.get());
+		}
 		void kingside_rochade();
 		void queenside_rochade();
 		void remove(Piece *piece) {
@@ -380,7 +403,7 @@
 			cur = cur + d;
 			if (! cur) { return false; }
 			if (cur == to) { return true; }
-			if (! brd.get(cur)) { return false; }
+			if (brd.get(cur)) { return false; }
 		}
 	}
 
@@ -390,9 +413,12 @@
 		Rook_Piece(std::unique_ptr<Piece> &&next, int file = 0, int rank = 0, bool white = true): Piece { std::move(next), file, rank, white } {}
 
 		bool can_move_to(Board &brd, const Position &to) override {
+			//std::cout << "{R" << (std::string) *this << " -> " << (std::string) to << ": ";
 			if (to.file() == file() || to.rank() == rank()) {
+				//std::cout << Piece::can_move_to(brd, to) << " (+)} ";
 				return Piece::can_move_to(brd, to);
 			}
+			//std::cout << " false} ";
 			return false;
 		}
 		std::string name() const override {
@@ -550,7 +576,7 @@
 		}
 	}
 
-#line 710 "index.md"
+#line 736 "index.md"
 
 	void test_1_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -578,7 +604,7 @@
 		}
 	}
 
-#line 749 "index.md"
+#line 775 "index.md"
 
 	void test_2_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -593,7 +619,7 @@
 		}
 	}
 
-#line 777 "index.md"
+#line 803 "index.md"
 
 	void test_8_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -620,7 +646,7 @@
 		}
 	}
 
-#line 813 "index.md"
+#line 839 "index.md"
 
 	void test_add(const Position &p, int f, int r, const std::string &exp) {
 		Position q { p + Position { f, r } };
@@ -630,7 +656,7 @@
 		}
 	}
 
-#line 834 "index.md"
+#line 860 "index.md"
 
 	bool move_piece(Piece *(Board::*fn)(int, bool) const, int nr, int f, int r) {
 		Piece *from { (brd.*fn)(nr, false) };
@@ -645,7 +671,7 @@
 		return true;
 	}
 
-#line 851 "index.md"
+#line 877 "index.md"
 
 	void move_king(int f, int r) {
 		if (! move_piece(&Board::king, 1, f, r)) {
@@ -653,7 +679,7 @@
 		}
 	}
 
-#line 861 "index.md"
+#line 887 "index.md"
 
 	void move_queen(int nr, int f, int r) {
 		if (! move_piece(&Board::queen, nr, f, r)) {
@@ -661,7 +687,7 @@
 		}
 	}
 
-#line 871 "index.md"
+#line 897 "index.md"
 
 	void move_rook(int nr, int f, int r) {
 		if (! move_piece(&Board::rook, nr, f, r)) {
@@ -669,7 +695,7 @@
 		}
 	}
 
-#line 881 "index.md"
+#line 907 "index.md"
 
 	void move_bishop(int nr, int f, int r) {
 		if (! move_piece(&Board::bishop, nr, f, r)) {
@@ -677,7 +703,7 @@
 		}
 	}
 
-#line 891 "index.md"
+#line 917 "index.md"
 
 	void move_knight(int nr, int f, int r) {
 		if (! move_piece(&Board::knight, nr, f, r)) {
@@ -685,7 +711,7 @@
 		}
 	}
 
-#line 901 "index.md"
+#line 927 "index.md"
 
 	void move_pawn(int nr, int f, int r) {
 		if (! brd.white()) {
@@ -697,7 +723,7 @@
 		}
 	}
 
-#line 915 "index.md"
+#line 941 "index.md"
 
 	void Board::kingside_rochade() {
 		Piece *kp { king() };
@@ -715,14 +741,19 @@
 		if (! r) {
 			fail("no kingside rook found");
 		}
-		Position nr { *kp + Position { 1, 0 } };
-		Position nk { *kp + Position { 2, 0 } };
-		r->file(nr.file());
-		kp->file(nk.file());
+		r->file(kf + 1);
+		kp->file(kf + 2);
 		std::cout << "O-O ";
+		/*
+		std::cout << "{ " << (std::string) *kp << " ";
+		for (Piece *cur { cur_->rooks.get() }; cur; cur = cur->next()) {
+			std::cout << (std::string) *cur << ' ';
+		}
+		std::cout << "} ";
+		*/
 	}
 
-#line 942 "index.md"
+#line 973 "index.md"
 
 	void Board::queenside_rochade() {
 		Piece *kp { king() };
@@ -741,8 +772,8 @@
 		}
 		Position nr { *kp + Position { -1, 0 } };
 		Position nk { *kp + Position { -2, 0 } };
-		r->file(nr.file());
-		kp->file(nk.file());
+		r->file(kf - 1);
+		kp->file(kf - 2);
 		std::cout << "O-O-O ";
 	}
 
@@ -759,18 +790,18 @@
 #line 44 "index.md"
  {
 	
-#line 704 "index.md"
+#line 730 "index.md"
  
 	Board brd;
 
-#line 740 "index.md"
+#line 766 "index.md"
 
 	test_1_fig(&Board::king, false, "e1");
 	test_1_fig(&Board::king, true, "e8");
 	test_1_fig(&Board::queen, false, "d1");
 	test_1_fig(&Board::queen, true, "d8");
 
-#line 766 "index.md"
+#line 792 "index.md"
 
 	test_2_fig(&Board::rook, false, "a1", "h1");
 	test_2_fig(&Board::rook, true, "a8", "h8");
@@ -779,12 +810,12 @@
 	test_2_fig(&Board::bishop, false, "c1", "f1");
 	test_2_fig(&Board::bishop, true, "c8", "f8");
 
-#line 806 "index.md"
+#line 832 "index.md"
 
 	test_8_fig(&Board::pawn, false, "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2");
 	test_8_fig(&Board::pawn, true, "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7");
 
-#line 825 "index.md"
+#line 851 "index.md"
  {
 	const auto &wk { *brd.king() };
 	test_add(wk, 0, 0, "e1");
@@ -879,7 +910,7 @@
 #line 198 "index.md"
 
 	
-#line 968 "index.md"
+#line 999 "index.md"
  {
 	brd.~Board();
 	new (&brd) Board();
@@ -1169,7 +1200,7 @@
 				move_queen(1, 5, 0);
 				break;
 			case 0x9c:
-				move_queen(1, 0, 6);
+				move_rook(1, 0, 6);
 				break;
 			case 0x9e:
 				move_pawn(6, 0, 2);
@@ -1337,7 +1368,11 @@
 				move_pawn(5, 0, 2);
 				break;
 			default:
-				std::cout << "xx {0x" << std::hex << (int) ch << std::dec << "} ";
+				std::string code;
+				const char digits[] = "0123456789abcdef";
+				code += digits[ch >> 4];
+				code += digits[ch & 0xf];
+				fail("unknown code 0x" + code);
 		}
 		brd.switch_players();
 	}

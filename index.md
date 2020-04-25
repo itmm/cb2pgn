@@ -314,6 +314,12 @@
 			if (pos == *this) { return this; };
 			return next() ? next()->find(pos) : nullptr;
 		}
+		bool any_attacks(Board &brd, const Piece &p) {
+			if (can_move_to(brd, p)) {
+				return true;
+			}
+			return next() ? next()->any_attacks(brd, p) : false;
+		}
 	};
 
 	struct Side {
@@ -336,6 +342,21 @@
 			if (r) { return r; }
 			r = pawns.get() ? pawns.get()->find(pos) : nullptr;
 			return r;
+		}
+		bool any_attacks(Board &brd, const Piece &p) {
+			if (queens && queens->any_attacks(brd, p)) {
+				return true;
+			}
+			if (rooks && rooks->any_attacks(brd, p)) {
+				return true;
+			}
+			if (bishops && bishops->any_attacks(brd, p)) {
+				return true;
+			}
+			if (knights && knights->any_attacks(brd, p)) {
+				return true;
+			}
+			return pawns->any_attacks(brd, p);
 		}
 		bool remove_inner(Piece *p, Piece *prev) {
 			while (prev) {
@@ -417,7 +438,9 @@
 		}
 		bool white() const { return &white_ == cur_; }
 		bool mate() const { return false; }
-		bool check() const { return false; }
+		bool check() { 
+			return cur_->any_attacks(*this, *other_->king.get());
+		}
 		void kingside_rochade();
 		void queenside_rochade();
 		void remove(Piece *piece) {
@@ -528,7 +551,7 @@
 			cur = cur + d;
 			if (! cur) { return false; }
 			if (cur == to) { return true; }
-			if (! brd.get(cur)) { return false; }
+			if (brd.get(cur)) { return false; }
 		}
 	}
 
@@ -538,9 +561,12 @@
 		Rook_Piece(std::unique_ptr<Piece> &&next, int file = 0, int rank = 0, bool white = true): Piece { std::move(next), file, rank, white } {}
 
 		bool can_move_to(Board &brd, const Position &to) override {
+			//std::cout << "{R" << (std::string) *this << " -> " << (std::string) to << ": ";
 			if (to.file() == file() || to.rank() == rank()) {
+				//std::cout << Piece::can_move_to(brd, to) << " (+)} ";
 				return Piece::can_move_to(brd, to);
 			}
+			//std::cout << " false} ";
 			return false;
 		}
 		std::string name() const override {
@@ -929,11 +955,16 @@
 		if (! r) {
 			fail("no kingside rook found");
 		}
-		Position nr { *kp + Position { 1, 0 } };
-		Position nk { *kp + Position { 2, 0 } };
-		r->file(nr.file());
-		kp->file(nk.file());
+		r->file(kf + 1);
+		kp->file(kf + 2);
 		std::cout << "O-O ";
+		/*
+		std::cout << "{ " << (std::string) *kp << " ";
+		for (Piece *cur { cur_->rooks.get() }; cur; cur = cur->next()) {
+			std::cout << (std::string) *cur << ' ';
+		}
+		std::cout << "} ";
+		*/
 	}
 @end(globals)
 ```
@@ -957,8 +988,8 @@
 		}
 		Position nr { *kp + Position { -1, 0 } };
 		Position nk { *kp + Position { -2, 0 } };
-		r->file(nr.file());
-		kp->file(nk.file());
+		r->file(kf - 1);
+		kp->file(kf - 2);
 		std::cout << "O-O-O ";
 	}
 @end(globals)
@@ -1254,7 +1285,7 @@
 				move_queen(1, 5, 0);
 				break;
 			case 0x9c:
-				move_queen(1, 0, 6);
+				move_rook(1, 0, 6);
 				break;
 			case 0x9e:
 				move_pawn(6, 0, 2);
@@ -1422,7 +1453,11 @@
 				move_pawn(5, 0, 2);
 				break;
 			default:
-				std::cout << "xx {0x" << std::hex << (int) ch << std::dec << "} ";
+				std::string code;
+				const char digits[] = "0123456789abcdef";
+				code += digits[ch >> 4];
+				code += digits[ch & 0xf];
+				fail("unknown code 0x" + code);
 		}
 		brd.switch_players();
 	}
