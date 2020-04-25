@@ -166,7 +166,7 @@
 			if (pos == *this) { return this; };
 			return next() ? next()->find(pos) : nullptr;
 		}
-		bool any_attacks(Board &brd, const Piece &p) {
+		bool any_attacks(Board &brd, const Position &p) {
 			if (can_move_to(brd, p)) {
 				return true;
 			}
@@ -195,7 +195,7 @@
 			r = pawns.get() ? pawns.get()->find(pos) : nullptr;
 			return r;
 		}
-		bool any_attacks(Board &brd, const Piece &p) {
+		bool any_attacks(Board &brd, const Position &p) {
 			if (queens && queens->any_attacks(brd, p)) {
 				return true;
 			}
@@ -289,7 +289,21 @@
 			cur_ = tmp;
 		}
 		bool white() const { return &white_ == cur_; }
-		bool mate() const { return false; }
+		bool mate() { 
+			Piece &k { *other_->king.get() };
+			for (int r { -1 }; r <= 1; ++r) {
+				for (int f { -1 }; f <= 1; ++f) {
+					if (! r && ! f) { continue; }
+					Position to {k + Position { f, r }};
+					if (to && k.can_move_to(*this, to)) {
+						if (! cur_->any_attacks(*this, to)) {
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
 		bool check() { 
 			return cur_->any_attacks(*this, *other_->king.get());
 		}
@@ -499,7 +513,7 @@
 			Piece *to_piece { brd.get(to) };
 			if (rank() == 2 && to.rank() == 4) {
 				return file() == to.file() && ! to_piece;
-			} else if (rank() + 1 == to) {
+			} else if (rank() + 1 == to.rank()) {
 				if (file() == to.file()) {
 					return ! to_piece;
 				};
@@ -576,7 +590,7 @@
 		}
 	}
 
-#line 736 "index.md"
+#line 750 "index.md"
 
 	void test_1_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -604,7 +618,7 @@
 		}
 	}
 
-#line 775 "index.md"
+#line 789 "index.md"
 
 	void test_2_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -619,7 +633,7 @@
 		}
 	}
 
-#line 803 "index.md"
+#line 817 "index.md"
 
 	void test_8_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -646,7 +660,7 @@
 		}
 	}
 
-#line 839 "index.md"
+#line 853 "index.md"
 
 	void test_add(const Position &p, int f, int r, const std::string &exp) {
 		Position q { p + Position { f, r } };
@@ -656,7 +670,7 @@
 		}
 	}
 
-#line 860 "index.md"
+#line 874 "index.md"
 
 	bool move_piece(Piece *(Board::*fn)(int, bool) const, int nr, int f, int r) {
 		Piece *from { (brd.*fn)(nr, false) };
@@ -671,7 +685,7 @@
 		return true;
 	}
 
-#line 877 "index.md"
+#line 891 "index.md"
 
 	void move_king(int f, int r) {
 		if (! move_piece(&Board::king, 1, f, r)) {
@@ -679,7 +693,7 @@
 		}
 	}
 
-#line 887 "index.md"
+#line 901 "index.md"
 
 	void move_queen(int nr, int f, int r) {
 		if (! move_piece(&Board::queen, nr, f, r)) {
@@ -687,7 +701,7 @@
 		}
 	}
 
-#line 897 "index.md"
+#line 911 "index.md"
 
 	void move_rook(int nr, int f, int r) {
 		if (! move_piece(&Board::rook, nr, f, r)) {
@@ -695,7 +709,7 @@
 		}
 	}
 
-#line 907 "index.md"
+#line 921 "index.md"
 
 	void move_bishop(int nr, int f, int r) {
 		if (! move_piece(&Board::bishop, nr, f, r)) {
@@ -703,7 +717,7 @@
 		}
 	}
 
-#line 917 "index.md"
+#line 931 "index.md"
 
 	void move_knight(int nr, int f, int r) {
 		if (! move_piece(&Board::knight, nr, f, r)) {
@@ -711,7 +725,7 @@
 		}
 	}
 
-#line 927 "index.md"
+#line 941 "index.md"
 
 	void move_pawn(int nr, int f, int r) {
 		if (! brd.white()) {
@@ -723,7 +737,7 @@
 		}
 	}
 
-#line 941 "index.md"
+#line 955 "index.md"
 
 	void Board::kingside_rochade() {
 		Piece *kp { king() };
@@ -753,7 +767,7 @@
 		*/
 	}
 
-#line 973 "index.md"
+#line 987 "index.md"
 
 	void Board::queenside_rochade() {
 		Piece *kp { king() };
@@ -790,18 +804,18 @@
 #line 44 "index.md"
  {
 	
-#line 730 "index.md"
+#line 744 "index.md"
  
 	Board brd;
 
-#line 766 "index.md"
+#line 780 "index.md"
 
 	test_1_fig(&Board::king, false, "e1");
 	test_1_fig(&Board::king, true, "e8");
 	test_1_fig(&Board::queen, false, "d1");
 	test_1_fig(&Board::queen, true, "d8");
 
-#line 792 "index.md"
+#line 806 "index.md"
 
 	test_2_fig(&Board::rook, false, "a1", "h1");
 	test_2_fig(&Board::rook, true, "a8", "h8");
@@ -810,12 +824,12 @@
 	test_2_fig(&Board::bishop, false, "c1", "f1");
 	test_2_fig(&Board::bishop, true, "c8", "f8");
 
-#line 832 "index.md"
+#line 846 "index.md"
 
 	test_8_fig(&Board::pawn, false, "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2");
 	test_8_fig(&Board::pawn, true, "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7");
 
-#line 851 "index.md"
+#line 865 "index.md"
  {
 	const auto &wk { *brd.king() };
 	test_add(wk, 0, 0, "e1");
@@ -910,7 +924,7 @@
 #line 198 "index.md"
 
 	
-#line 999 "index.md"
+#line 1013 "index.md"
  {
 	brd.~Board();
 	new (&brd) Board();

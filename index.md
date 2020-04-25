@@ -314,7 +314,7 @@
 			if (pos == *this) { return this; };
 			return next() ? next()->find(pos) : nullptr;
 		}
-		bool any_attacks(Board &brd, const Piece &p) {
+		bool any_attacks(Board &brd, const Position &p) {
 			if (can_move_to(brd, p)) {
 				return true;
 			}
@@ -343,7 +343,7 @@
 			r = pawns.get() ? pawns.get()->find(pos) : nullptr;
 			return r;
 		}
-		bool any_attacks(Board &brd, const Piece &p) {
+		bool any_attacks(Board &brd, const Position &p) {
 			if (queens && queens->any_attacks(brd, p)) {
 				return true;
 			}
@@ -437,7 +437,21 @@
 			cur_ = tmp;
 		}
 		bool white() const { return &white_ == cur_; }
-		bool mate() const { return false; }
+		bool mate() { 
+			Piece &k { *other_->king.get() };
+			for (int r { -1 }; r <= 1; ++r) {
+				for (int f { -1 }; f <= 1; ++f) {
+					if (! r && ! f) { continue; }
+					Position to {k + Position { f, r }};
+					if (to && k.can_move_to(*this, to)) {
+						if (! cur_->any_attacks(*this, to)) {
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
 		bool check() { 
 			return cur_->any_attacks(*this, *other_->king.get());
 		}
@@ -647,7 +661,7 @@
 			Piece *to_piece { brd.get(to) };
 			if (rank() == 2 && to.rank() == 4) {
 				return file() == to.file() && ! to_piece;
-			} else if (rank() + 1 == to) {
+			} else if (rank() + 1 == to.rank()) {
 				if (file() == to.file()) {
 					return ! to_piece;
 				};

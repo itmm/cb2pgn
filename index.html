@@ -346,7 +346,7 @@
 <span class="in3"></span><span class="keyword">if</span> (<span class="var">pos</span> == *<span class="var">this</span>) { <span class="keyword">return</span> <span class="var">this</span>; };<br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="fn">next</span>() ? <span class="fn">next</span>()-&gt;<span class="fn">find</span>(<span class="var">pos</span>) : <span class="num">nullptr</span>;<br/>
 <span class="in2"></span>}<br/>
-<span class="in2"></span><span class="type">bool</span> <span class="fn">any_attacks</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Piece</span> &amp;<span class="var">p</span>) {<br/>
+<span class="in2"></span><span class="type">bool</span> <span class="fn">any_attacks</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">p</span>) {<br/>
 <span class="in3"></span><span class="keyword">if</span> (<span class="fn">can_move_to</span>(<span class="var">brd</span>, <span class="var">p</span>)) {<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
 <span class="in3"></span>}<br/>
@@ -375,7 +375,7 @@
 <span class="in3"></span><span class="var">r</span> = <span class="var">pawns</span>.<span class="fn">get</span>() ? <span class="var">pawns</span>.<span class="fn">get</span>()-&gt;<span class="fn">find</span>(<span class="var">pos</span>) : <span class="num">nullptr</span>;<br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="var">r</span>;<br/>
 <span class="in2"></span>}<br/>
-<span class="in2"></span><span class="type">bool</span> <span class="fn">any_attacks</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Piece</span> &amp;<span class="var">p</span>) {<br/>
+<span class="in2"></span><span class="type">bool</span> <span class="fn">any_attacks</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">p</span>) {<br/>
 <span class="in3"></span><span class="keyword">if</span> (<span class="var">queens</span> &amp;&amp; <span class="var">queens</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>)) {<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
 <span class="in3"></span>}<br/>
@@ -469,7 +469,21 @@
 <span class="in3"></span><span class="var">cur_</span> = <span class="var">tmp</span>;<br/>
 <span class="in2"></span>}<br/>
 <span class="in2"></span><span class="type">bool</span> <span class="fn">white</span>() <span class="type">const</span> { <span class="keyword">return</span> &amp;<span class="var">white_</span> == <span class="var">cur_</span>; }<br/>
-<span class="in2"></span><span class="type">bool</span> <span class="fn">mate</span>() <span class="type">const</span> { <span class="keyword">return</span> <span class="num">false</span>; }<br/>
+<span class="in2"></span><span class="type">bool</span> <span class="fn">mate</span>() { <br/>
+<span class="in3"></span><span class="type">Piece</span> &amp;<span class="var">k</span> { *<span class="var">other_</span>-&gt;<span class="var">king</span>.<span class="fn">get</span>() };<br/>
+<span class="in3"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">r</span> { -<span class="num">1</span> }; <span class="var">r</span> &lt;= <span class="num">1</span>; ++<span class="var">r</span>) {<br/>
+<span class="in4"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">f</span> { -<span class="num">1</span> }; <span class="var">f</span> &lt;= <span class="num">1</span>; ++<span class="var">f</span>) {<br/>
+<span class="in5"></span><span class="keyword">if</span> (! <span class="var">r</span> &amp;&amp; ! <span class="var">f</span>) { <span class="keyword">continue</span>; }<br/>
+<span class="in5"></span><span class="type">Position</span> <span class="var">to</span> {<span class="var">k</span> + <span class="type">Position</span> { <span class="var">f</span>, <span class="var">r</span> }};<br/>
+<span class="in5"></span><span class="keyword">if</span> (<span class="var">to</span> &amp;&amp; <span class="var">k</span>.<span class="fn">can_move_to</span>(*<span class="var">this</span>, <span class="var">to</span>)) {<br/>
+<span class="in6"></span><span class="keyword">if</span> (! <span class="var">cur_</span>-&gt;<span class="fn">any_attacks</span>(*<span class="var">this</span>, <span class="var">to</span>)) {<br/>
+<span class="in7"></span><span class="keyword">return</span> <span class="num">false</span>;<br/>
+<span class="in6"></span>}<br/>
+<span class="in5"></span>}<br/>
+<span class="in4"></span>}<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
+<span class="in2"></span>}<br/>
 <span class="in2"></span><span class="type">bool</span> <span class="fn">check</span>() { <br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">any_attacks</span>(*<span class="var">this</span>, *<span class="var">other_</span>-&gt;<span class="var">king</span>.<span class="fn">get</span>());<br/>
 <span class="in2"></span>}<br/>
@@ -679,7 +693,7 @@
 <span class="in3"></span><span class="type">Piece</span> *<span class="var">to_piece</span> { <span class="var">brd</span>.<span class="fn">get</span>(<span class="var">to</span>) };<br/>
 <span class="in3"></span><span class="keyword">if</span> (<span class="fn">rank</span>() == <span class="num">2</span> &amp;&amp; <span class="var">to</span>.<span class="fn">rank</span>() == <span class="num">4</span>) {<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="fn">file</span>() == <span class="var">to</span>.<span class="fn">file</span>() &amp;&amp; ! <span class="var">to_piece</span>;<br/>
-<span class="in3"></span>} <span class="keyword">else</span> <span class="keyword">if</span> (<span class="fn">rank</span>() + <span class="num">1</span> == <span class="var">to</span>) {<br/>
+<span class="in3"></span>} <span class="keyword">else</span> <span class="keyword">if</span> (<span class="fn">rank</span>() + <span class="num">1</span> == <span class="var">to</span>.<span class="fn">rank</span>()) {<br/>
 <span class="in4"></span><span class="keyword">if</span> (<span class="fn">file</span>() == <span class="var">to</span>.<span class="fn">file</span>()) {<br/>
 <span class="in5"></span><span class="keyword">return</span> ! <span class="var">to_piece</span>;<br/>
 <span class="in4"></span>};<br/>
