@@ -21,7 +21,7 @@
 		std::exit(EXIT_FAILURE);
 	}
 
-#line 73 "index.md"
+#line 77 "index.md"
 
 	int get_int(
 		const char *c, int len = 4
@@ -34,7 +34,7 @@
 		return result;
 	}
 
-#line 107 "index.md"
+#line 111 "index.md"
 
 	std::string to_str(int value, unsigned pad = 0) {
 		std::string result { std::to_string(value) };
@@ -44,7 +44,7 @@
 		return result;
 	}
 
-#line 145 "index.md"
+#line 149 "index.md"
 
 	std::string to_str_not_null(
 		int value,
@@ -55,7 +55,28 @@
 		) : placeholder;
 	}
 
-#line 205 "index.md"
+#line 184 "index.md"
+
+	void print_player(std::ifstream &in, int nr) {
+		if (! in.seekg(32 + 67 * nr, std::ifstream::beg)) {
+			fail("can't move to player " + to_str(nr));
+		}
+		char entry[67];
+		if (! in.read(entry, sizeof(entry))) {
+			fail("can't read player " + to_str(nr));
+		}
+		for (char *c { entry + 9 }; *c && c < entry + 39; ++c) {
+			std::cout << *c;
+		}
+		if (entry[9] && entry[39]) {
+			std::cout << ", ";
+		}
+		for (char *c { entry + 39 }; *c && c < entry + 59; ++c) {
+			std::cout << *c;
+		}
+	}
+
+#line 243 "index.md"
 
 	int get_int(
 		std::istream &in, int len = 4
@@ -68,7 +89,7 @@
 		return result;
 	}
 
-#line 220 "index.md"
+#line 258 "index.md"
 
 	#include <memory>
 
@@ -590,7 +611,7 @@
 		}
 	}
 
-#line 750 "index.md"
+#line 788 "index.md"
 
 	void test_1_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -618,7 +639,7 @@
 		}
 	}
 
-#line 789 "index.md"
+#line 827 "index.md"
 
 	void test_2_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -633,7 +654,7 @@
 		}
 	}
 
-#line 817 "index.md"
+#line 855 "index.md"
 
 	void test_8_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -660,7 +681,7 @@
 		}
 	}
 
-#line 853 "index.md"
+#line 891 "index.md"
 
 	void test_add(const Position &p, int f, int r, const std::string &exp) {
 		Position q { p + Position { f, r } };
@@ -670,7 +691,7 @@
 		}
 	}
 
-#line 874 "index.md"
+#line 912 "index.md"
 
 	bool move_piece(Piece *(Board::*fn)(int, bool) const, int nr, int f, int r) {
 		Piece *from { (brd.*fn)(nr, false) };
@@ -685,7 +706,7 @@
 		return true;
 	}
 
-#line 891 "index.md"
+#line 929 "index.md"
 
 	void move_king(int f, int r) {
 		if (! move_piece(&Board::king, 1, f, r)) {
@@ -693,7 +714,7 @@
 		}
 	}
 
-#line 901 "index.md"
+#line 939 "index.md"
 
 	void move_queen(int nr, int f, int r) {
 		if (! move_piece(&Board::queen, nr, f, r)) {
@@ -701,7 +722,7 @@
 		}
 	}
 
-#line 911 "index.md"
+#line 949 "index.md"
 
 	void move_rook(int nr, int f, int r) {
 		if (! move_piece(&Board::rook, nr, f, r)) {
@@ -709,7 +730,7 @@
 		}
 	}
 
-#line 921 "index.md"
+#line 959 "index.md"
 
 	void move_bishop(int nr, int f, int r) {
 		if (! move_piece(&Board::bishop, nr, f, r)) {
@@ -717,7 +738,7 @@
 		}
 	}
 
-#line 931 "index.md"
+#line 969 "index.md"
 
 	void move_knight(int nr, int f, int r) {
 		if (! move_piece(&Board::knight, nr, f, r)) {
@@ -725,7 +746,7 @@
 		}
 	}
 
-#line 941 "index.md"
+#line 979 "index.md"
 
 	void move_pawn(int nr, int f, int r) {
 		if (! brd.white()) {
@@ -737,7 +758,7 @@
 		}
 	}
 
-#line 955 "index.md"
+#line 993 "index.md"
 
 	void Board::kingside_rochade() {
 		Piece *kp { king() };
@@ -767,7 +788,7 @@
 		*/
 	}
 
-#line 987 "index.md"
+#line 1025 "index.md"
 
 	void Board::queenside_rochade() {
 		Piece *kp { king() };
@@ -804,18 +825,18 @@
 #line 44 "index.md"
  {
 	
-#line 744 "index.md"
+#line 782 "index.md"
  
 	Board brd;
 
-#line 780 "index.md"
+#line 818 "index.md"
 
 	test_1_fig(&Board::king, false, "e1");
 	test_1_fig(&Board::king, true, "e8");
 	test_1_fig(&Board::queen, false, "d1");
 	test_1_fig(&Board::queen, true, "d8");
 
-#line 806 "index.md"
+#line 844 "index.md"
 
 	test_2_fig(&Board::rook, false, "a1", "h1");
 	test_2_fig(&Board::rook, true, "a8", "h8");
@@ -824,12 +845,12 @@
 	test_2_fig(&Board::bishop, false, "c1", "f1");
 	test_2_fig(&Board::bishop, true, "c8", "f8");
 
-#line 846 "index.md"
+#line 884 "index.md"
 
 	test_8_fig(&Board::pawn, false, "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2");
 	test_8_fig(&Board::pawn, true, "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7");
 
-#line 865 "index.md"
+#line 903 "index.md"
  {
 	const auto &wk { *brd.king() };
 	test_add(wk, 0, 0, "e1");
@@ -848,9 +869,13 @@
 		(path + ".cbg").c_str(),
 		std::ifstream::binary
 	};
+	std::ifstream player_file {
+		(path + ".cbp").c_str(),
+		std::ifstream::binary
+	};
 	char main_entry[46];
 
-#line 61 "index.md"
+#line 65 "index.md"
 
 	if (! main_file.read(
 		main_entry, sizeof(main_entry)
@@ -860,20 +885,20 @@
 		);
 	}
 
-#line 88 "index.md"
+#line 92 "index.md"
 
 	int count { get_int(main_entry + 6) };
 	--count;
 	std::cout << "number of games: " <<
 		count << "\n";
 
-#line 97 "index.md"
+#line 101 "index.md"
 
 	for (; main_file.read(
 		main_entry, sizeof(main_entry)
 	); --count) {
 		
-#line 131 "index.md"
+#line 135 "index.md"
  {
 	int date { get_int(
 		main_entry + 24, 3
@@ -883,7 +908,7 @@
 	int year { date >> 9 };
 	if (year || month || day) {
 		
-#line 158 "index.md"
+#line 162 "index.md"
 
 	std::cout << "[Date \"" << 
 		to_str_not_null(year, "????") <<
@@ -893,11 +918,11 @@
 		to_str_not_null(day, "??") <<
 		"\"]\n";
 
-#line 139 "index.md"
+#line 143 "index.md"
 ;
 	}
 } 
-#line 170 "index.md"
+#line 174 "index.md"
  {
 	int round { main_entry[29] };
 	if (round) {
@@ -905,7 +930,16 @@
 			to_str(round) << "\"]\n";
 	}
 } 
-#line 180 "index.md"
+#line 207 "index.md"
+ {
+	std::cout << "[White \"";
+	print_player(player_file, get_int(main_entry + 9, 3));
+	std::cout << "\"]\n";
+	std::cout << "[Black \"";
+	print_player(player_file, get_int(main_entry + 12, 3));
+	std::cout << "\"]\n";
+} 
+#line 218 "index.md"
 
 	std::string result;
 	switch (main_entry[27]) {
@@ -921,10 +955,10 @@
 	std::cout << "[Result \"" <<
 		result << "\"]\n";
 
-#line 198 "index.md"
+#line 236 "index.md"
 
 	
-#line 1013 "index.md"
+#line 1051 "index.md"
  {
 	brd.~Board();
 	new (&brd) Board();
@@ -1391,15 +1425,15 @@
 		brd.switch_players();
 	}
 } 
-#line 199 "index.md"
+#line 237 "index.md"
 ;
 	std::cout << result << "\n\n";
 
-#line 101 "index.md"
+#line 105 "index.md"
 ;
 	}
 
-#line 119 "index.md"
+#line 123 "index.md"
 
 	if (count == 0) {
 		std::cout << "DONE\n";

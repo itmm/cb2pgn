@@ -53,6 +53,10 @@
 		(path + ".cbg").c_str(),
 		std::ifstream::binary
 	};
+	std::ifstream player_file {
+		(path + ".cbp").c_str(),
+		std::ifstream::binary
+	};
 	char main_entry[46];
 @end(main)
 ```
@@ -173,6 +177,40 @@
 		std::cout << "[Round \"" <<
 			to_str(round) << "\"]\n";
 	}
+} @end(process game)
+```
+
+```
+@add(globals)
+	void print_player(std::ifstream &in, int nr) {
+		if (! in.seekg(32 + 67 * nr, std::ifstream::beg)) {
+			fail("can't move to player " + to_str(nr));
+		}
+		char entry[67];
+		if (! in.read(entry, sizeof(entry))) {
+			fail("can't read player " + to_str(nr));
+		}
+		for (char *c { entry + 9 }; *c && c < entry + 39; ++c) {
+			std::cout << *c;
+		}
+		if (entry[9] && entry[39]) {
+			std::cout << ", ";
+		}
+		for (char *c { entry + 39 }; *c && c < entry + 59; ++c) {
+			std::cout << *c;
+		}
+	}
+@end(globals)
+```
+
+```
+@add(process game) {
+	std::cout << "[White \"";
+	print_player(player_file, get_int(main_entry + 9, 3));
+	std::cout << "\"]\n";
+	std::cout << "[Black \"";
+	print_player(player_file, get_int(main_entry + 12, 3));
+	std::cout << "\"]\n";
 } @end(process game)
 ```
 
