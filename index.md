@@ -139,9 +139,7 @@
 	int day { date & 0x1f };
 	int month { (date & 0x1e0) >> 5 };
 	int year { date >> 9 };
-	if (year || month || day) {
-		@put(print date);
-	}
+	@put(print date);
 } @end(process game)
 ```
 
@@ -160,6 +158,8 @@
 
 ```
 @def(print date)
+	std::cout << "[Event \"?\"]\n";
+	std::cout << "[Site \"?\"]\n";
 	std::cout << "[Date \"" << 
 		to_str_not_null(year, "????") <<
 		"." <<
@@ -173,10 +173,8 @@
 ```
 @add(process game) {
 	int round { main_entry[29] };
-	if (round) {
-		std::cout << "[Round \"" <<
-			to_str(round) << "\"]\n";
-	}
+	std::cout << "[Round \"" <<
+		(round ? to_str(round) : "?") << "\"]\n";
 } @end(process game)
 ```
 

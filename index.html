@@ -164,9 +164,7 @@
 <span class="in1"></span><span class="type">int</span> <span class="var">day</span> { <span class="var">date</span> &amp; <span class="num">0x1f</span> };<br/>
 <span class="in1"></span><span class="type">int</span> <span class="var">month</span> { (<span class="var">date</span> &amp; <span class="num">0x1e0</span>) &gt;&gt; <span class="num">5</span> };<br/>
 <span class="in1"></span><span class="type">int</span> <span class="var">year</span> { <span class="var">date</span> &gt;&gt; <span class="num">9</span> };<br/>
-<span class="in1"></span><span class="keyword">if</span> (<span class="var">year</span> || <span class="var">month</span> || <span class="var">day</span>) {<br/>
-<span class="in2"></span><span class="macro">@put(<span class="name">print date</span>)</span>;<br/>
-<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="macro">@put(<span class="name">print date</span>)</span>;<br/>
 } <span class="macro">@end(<span class="name">process game</span>)</span><br/>
 </code></div>
 </div>
@@ -187,6 +185,8 @@
 <div class="page"><div class="slide"><div class="slide-nr">16</div>
 <code>
 <span class="macro">@def(<span class="name">print date</span>)</span><br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Event \"?\"]\n"</span>;<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Site \"?\"]\n"</span>;<br/>
 <span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Date \""</span> &lt;&lt; <br/>
 <span class="in2"></span><span class="fn">to_str_not_null</span>(<span class="var">year</span>, <span class="str">"????"</span>) &lt;&lt;<br/>
 <span class="in2"></span><span class="str">"."</span> &lt;&lt;<br/>
@@ -201,10 +201,8 @@
 <code>
 <span class="macro">@add(<span class="name">process game</span>)</span> {<br/>
 <span class="in1"></span><span class="type">int</span> <span class="var">round</span> { <span class="var">main_entry</span>[<span class="num">29</span>] };<br/>
-<span class="in1"></span><span class="keyword">if</span> (<span class="var">round</span>) {<br/>
-<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Round \""</span> &lt;&lt;<br/>
-<span class="in3"></span><span class="fn">to_str</span>(<span class="var">round</span>) &lt;&lt; <span class="str">"\"]\n"</span>;<br/>
-<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Round \""</span> &lt;&lt;<br/>
+<span class="in2"></span>(<span class="var">round</span> ? <span class="fn">to_str</span>(<span class="var">round</span>) : <span class="str">"?"</span>) &lt;&lt; <span class="str">"\"]\n"</span>;<br/>
 } <span class="macro">@end(<span class="name">process game</span>)</span><br/>
 </code></div>
 </div>
