@@ -280,6 +280,16 @@
 			}
 			return false;
 		}
+		Piece *add_piece(Piece *np, std::unique_ptr<Piece> &lst) {
+			if (! lst) {
+				lst.reset(np);
+			} else {
+				Piece *p { lst.get() };
+				for (; p->next(); p = p->next()) {}
+				p->reset(np);
+			}
+			return np;
+		}
 	};
 
 	class Board {
@@ -340,6 +350,28 @@
 				if (black_.remove(piece)) { return; }
 				fail("can't remove piece " + name);
 			}
+		}
+		Piece *add_queen(const Position &pos);
+		Piece *add_rook(const Position &pos);
+		Piece *add_bishop(const Position &pos);
+		Piece *add_knight(const Position &pos);
+		Piece *first(const Piece &p) {
+			if (p.name() == "") {
+				return cur_->pawns.get();
+			} else if (p.name() == "K") {
+				return cur_->king.get();
+			} else if (p.name() == "Q") {
+				return cur_->queens.get();
+			} else if (p.name() == "R") {
+				return cur_->rooks.get();
+			} else if (p.name() == "B") {
+				return cur_->bishops.get();
+			} else if (p.name() == "N") {
+				return cur_->knights.get();
+			} else {
+				fail("uknown name " + p.name());
+			}
+			return nullptr;
 		}
 	} brd;
 
@@ -578,6 +610,20 @@
 		}
 	};
 
+	Piece *Board::add_queen(const Position &pos) {
+		return cur_->add_piece(new Queen_Piece(pos.file(), pos.rank(), white()), cur_->queens);
+	}
+
+	Piece *Board::add_rook(const Position &pos) {
+		return cur_->add_piece(new Rook_Piece(pos.file(), pos.rank(), white()), cur_->rooks);
+	}
+	Piece *Board::add_bishop(const Position &pos) {
+		return cur_->add_piece(new Bishop_Piece(pos.file(), pos.rank(), white()), cur_->bishops);
+	}
+	Piece *Board::add_knight(const Position &pos) {
+		return cur_->add_piece(new Knight_Piece(pos.file(), pos.rank(), white()), cur_->knights);
+	}
+
 	Board::Board() {
 		white_.king = std::make_unique<King_Piece>(5, 1, true);
 		black_.king = std::make_unique<King_Piece>(5, 8, false);
@@ -611,7 +657,7 @@
 		}
 	}
 
-#line 786 "index.md"
+#line 832 "index.md"
 
 	void test_1_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -639,7 +685,7 @@
 		}
 	}
 
-#line 825 "index.md"
+#line 871 "index.md"
 
 	void test_2_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -654,7 +700,7 @@
 		}
 	}
 
-#line 853 "index.md"
+#line 899 "index.md"
 
 	void test_8_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -681,7 +727,7 @@
 		}
 	}
 
-#line 889 "index.md"
+#line 935 "index.md"
 
 	void test_add(const Position &p, int f, int r, const std::string &exp) {
 		Position q { p + Position { f, r } };
@@ -691,7 +737,7 @@
 		}
 	}
 
-#line 910 "index.md"
+#line 956 "index.md"
 
 	bool move_piece(Piece *(Board::*fn)(int, bool) const, int nr, int f, int r) {
 		Piece *from { (brd.*fn)(nr, false) };
@@ -706,7 +752,7 @@
 		return true;
 	}
 
-#line 927 "index.md"
+#line 973 "index.md"
 
 	void move_king(int f, int r) {
 		if (! move_piece(&Board::king, 1, f, r)) {
@@ -714,7 +760,7 @@
 		}
 	}
 
-#line 937 "index.md"
+#line 983 "index.md"
 
 	void move_queen(int nr, int f, int r) {
 		if (! move_piece(&Board::queen, nr, f, r)) {
@@ -722,7 +768,7 @@
 		}
 	}
 
-#line 947 "index.md"
+#line 993 "index.md"
 
 	void move_rook(int nr, int f, int r) {
 		if (! move_piece(&Board::rook, nr, f, r)) {
@@ -730,7 +776,7 @@
 		}
 	}
 
-#line 957 "index.md"
+#line 1003 "index.md"
 
 	void move_bishop(int nr, int f, int r) {
 		if (! move_piece(&Board::bishop, nr, f, r)) {
@@ -738,7 +784,7 @@
 		}
 	}
 
-#line 967 "index.md"
+#line 1013 "index.md"
 
 	void move_knight(int nr, int f, int r) {
 		if (! move_piece(&Board::knight, nr, f, r)) {
@@ -746,7 +792,7 @@
 		}
 	}
 
-#line 977 "index.md"
+#line 1023 "index.md"
 
 	void move_pawn(int nr, int f, int r) {
 		if (! brd.white()) {
@@ -758,7 +804,7 @@
 		}
 	}
 
-#line 991 "index.md"
+#line 1037 "index.md"
 
 	void Board::kingside_rochade() {
 		Piece *kp { king() };
@@ -788,7 +834,7 @@
 		*/
 	}
 
-#line 1023 "index.md"
+#line 1069 "index.md"
 
 	void Board::queenside_rochade() {
 		Piece *kp { king() };
@@ -825,18 +871,18 @@
 #line 44 "index.md"
  {
 	
-#line 780 "index.md"
+#line 826 "index.md"
  
 	Board brd;
 
-#line 816 "index.md"
+#line 862 "index.md"
 
 	test_1_fig(&Board::king, false, "e1");
 	test_1_fig(&Board::king, true, "e8");
 	test_1_fig(&Board::queen, false, "d1");
 	test_1_fig(&Board::queen, true, "d8");
 
-#line 842 "index.md"
+#line 888 "index.md"
 
 	test_2_fig(&Board::rook, false, "a1", "h1");
 	test_2_fig(&Board::rook, true, "a8", "h8");
@@ -845,12 +891,12 @@
 	test_2_fig(&Board::bishop, false, "c1", "f1");
 	test_2_fig(&Board::bishop, true, "c8", "f8");
 
-#line 882 "index.md"
+#line 928 "index.md"
 
 	test_8_fig(&Board::pawn, false, "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2");
 	test_8_fig(&Board::pawn, true, "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7");
 
-#line 901 "index.md"
+#line 947 "index.md"
  {
 	const auto &wk { *brd.king() };
 	test_add(wk, 0, 0, "e1");
@@ -956,7 +1002,7 @@
 #line 234 "index.md"
 
 	
-#line 1049 "index.md"
+#line 1095 "index.md"
  {
 	brd.~Board();
 	new (&brd) Board();
@@ -974,6 +1020,40 @@
 		for (int i { 28 }; i; --i) { game_file.get(); }
 	}
 
+static short MoveNumberLookup[256] = {
+   0xa2, 0x95, 0x43, 0xf5, 0xc1, 0x3d, 0x4a, 0x6c, //   0 -   7
+   0x53, 0x83, 0xcc, 0x7c, 0xff, 0xae, 0x68, 0xad, //   8 -  15
+   0xd1, 0x92, 0x8b, 0x8d, 0x35, 0x81, 0x5e, 0x74, //  16 -  23
+   0x26, 0x8e, 0xab, 0xca, 0xfd, 0x9a, 0xf3, 0xa0, //  24 -  31
+   0xa5, 0x15, 0xfc, 0xb1, 0x1e, 0xed, 0x30, 0xea, //  32 -  39
+   0x22, 0xeb, 0xa7, 0xcd, 0x4e, 0x6f, 0x2e, 0x24, //  40 -  47
+   0x32, 0x94, 0x41, 0x8c, 0x6e, 0x58, 0x82, 0x50, //  48 -  55
+   0xbb, 0x02, 0x8a, 0xd8, 0xfa, 0x60, 0xde, 0x52, //  56 -  63
+   0xba, 0x46, 0xac, 0x29, 0x9d, 0xd7, 0xdf, 0x08, //  64 -  71
+   0x21, 0x01, 0x66, 0xa3, 0xf1, 0x19, 0x27, 0xb5, //  72 -  79
+   0x91, 0xd5, 0x42, 0x0e, 0xb4, 0x4c, 0xd9, 0x18, //  80 -  87
+   0x5f, 0xbc, 0x25, 0xa6, 0x96, 0x04, 0x56, 0x6a, //  88 -  95
+   0xaa, 0x33, 0x1c, 0x2b, 0x73, 0xf0, 0xdd, 0xa4, //  96 - 103
+   0x37, 0xd3, 0xc5, 0x10, 0xbf, 0x5a, 0x23, 0x34, // 104 - 111
+   0x75, 0x5b, 0xb8, 0x55, 0xd2, 0x6b, 0x09, 0x3a, // 112 - 119
+   0x57, 0x12, 0xb3, 0x77, 0x48, 0x85, 0x9b, 0x0f, // 120 - 127
+   0x9e, 0xc7, 0xc8, 0xa1, 0x7f, 0x7a, 0xc0, 0xbd, // 128 - 135
+   0x31, 0x6d, 0xf6, 0x3e, 0xc3, 0x11, 0x71, 0xce, // 136 - 143
+   0x7d, 0xda, 0xa8, 0x54, 0x90, 0x97, 0x1f, 0x44, // 144 - 151
+   0x40, 0x16, 0xc9, 0xe3, 0x2c, 0xcb, 0x84, 0xec, // 152 - 159
+   0x9f, 0x3f, 0x5c, 0xe6, 0x76, 0x0b, 0x3c, 0x20, // 160 - 167
+   0xb7, 0x36, 0x00, 0xdc, 0xe7, 0xf9, 0x4f, 0xf7, // 168 - 175
+   0xaf, 0x06, 0x07, 0xe0, 0x1a, 0x0a, 0xa9, 0x4b, // 176 - 183
+   0x0c, 0xd6, 0x63, 0x87, 0x89, 0x1d, 0x13, 0x1b, // 184 - 191
+   0xe4, 0x70, 0x05, 0x47, 0x67, 0x7b, 0x2f, 0xee, // 192 - 199
+   0xe2, 0xe8, 0x98, 0x0d, 0xef, 0xcf, 0xc4, 0xf4, // 200 - 207
+   0xfb, 0xb0, 0x17, 0x99, 0x64, 0xf2, 0xd4, 0x2a, // 208 - 215
+   0x03, 0x4d, 0x78, 0xc6, 0xfe, 0x65, 0x86, 0x88, // 216 - 223
+   0x79, 0x45, 0x3b, 0xe5, 0x49, 0x8f, 0x2d, 0xb9, // 224 - 231
+   0xbe, 0x62, 0x93, 0x14, 0xe9, 0xd0, 0x38, 0x9c, // 232 - 239
+   0xb2, 0xc2, 0x59, 0x5d, 0xb6, 0x72, 0x51, 0xf8, // 240 - 247
+    0x28, 0x7e, 0x61, 0x39, 0xe1, 0xdb, 0x69, 0x80, // 248 - 255
+ 	};
 	std::cout << "\n";
 	for (int count { 0 }, nr { 0 }; len; ++count, ++nr, --len) {
 		int ch { (game_file.get() - count) & 0xff };
@@ -1047,6 +1127,46 @@
 			case 0x28:
 				move_queen(1, 3, 5);
 				break;
+			case 0x29: {
+				int mv { MoveNumberLookup[(game_file.get() - count) & 0xff] };
+				mv = (mv << 8) | MoveNumberLookup[(game_file.get() - count) & 0xff];
+				int from { mv & 0x3f };
+				int to { (mv >> 6) & 0x3f };
+				int prom { (mv >> 12) & 0x3 };
+				Piece *from_piece { brd.get(Position {(from >> 3) + 1, from % 8 + 1 }) };
+				if (! from_piece) {
+					fail("no from piece at: " + (std::string) Position { (from >> 3) + 1, from % 8 + 1 });
+				}
+				Position top { (to >> 3) + 1, to % 8 + 1};
+				if (! to) {
+					fail("no to position " + to_str(to >> 3) + ", " + to_str(to % 8));
+				}
+				if (from_piece->pawn() && (top.rank() == 1 || top.rank() == 8)) {
+					from_piece->file(0);
+					from_piece->rank(0);
+					Piece *to_piece { nullptr };
+					switch (prom) {
+						case 0:
+							to_piece = brd.add_queen(top);
+							break;
+						case 1:
+							to_piece = brd.add_rook(top);
+							break;
+						case 2:
+							to_piece = brd.add_bishop(top);
+							break;
+						case 3:
+							to_piece = brd.add_knight(top);
+							break;
+						default:
+							fail("unknown promotion piece " + to_str(prom));
+					}
+					std::cout << (std::string) top << "=" << to_piece->name() << ' ';
+					break;
+				}
+				brd.move(brd.first(*from_piece), from_piece, top);
+				break;
+			}
 			case 0x2c:
 				move_bishop(1, 5, 3);
 				break;
