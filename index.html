@@ -1206,7 +1206,7 @@
 <span class="in3"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; (<span class="num">1</span> + (<span class="var">nr</span> &gt;&gt; <span class="num">1</span>)) &lt;&lt; <span class="str">". "</span>;<br/>
 <span class="in2"></span>}<br/>
 <span class="in2"></span>//<span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'['</span> &lt;&lt; <span class="var">count</span> &lt;&lt; <span class="str">", "</span> &lt;&lt; <span class="var">len</span> &lt;&lt; <span class="str">", "</span> &lt;&lt; <span class="var">nr</span> &lt;&lt; <span class="str">"] "</span>;<br/>
-<span class="in2"></span>//<span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'{'</span> &lt;&lt; <span class="type">std</span>::<span class="var">hex</span> &lt;&lt; <span class="var">ch</span> &lt;&lt; <span class="type">std</span>::<span class="var">dec</span> &lt;&lt; <span class="str">"} "</span>;<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'{'</span> &lt;&lt; <span class="type">std</span>::<span class="var">hex</span> &lt;&lt; <span class="var">ch</span> &lt;&lt; <span class="type">std</span>::<span class="var">dec</span> &lt;&lt; <span class="str">"} "</span>;<br/>
 <br/>
 <span class="in2"></span><span class="keyword">switch</span> (<span class="var">ch</span>) {<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x02</span>:<br/>
@@ -1280,7 +1280,7 @@
 <span class="in5"></span><span class="fn">fail</span>(<span class="str">"no from piece at: "</span> + (<span class="type">std</span>::<span class="type">string</span>) <span class="type">Position</span> { (<span class="var">from</span> &gt;&gt; <span class="num">3</span>) + <span class="num">1</span>, <span class="var">from</span> % <span class="num">8</span> + <span class="num">1</span> });<br/>
 <span class="in4"></span>}<br/>
 <span class="in4"></span><span class="type">Position</span> <span class="var">top</span> { (<span class="var">to</span> &gt;&gt; <span class="num">3</span>) + <span class="num">1</span>, <span class="var">to</span> % <span class="num">8</span> + <span class="num">1</span>};<br/>
-<span class="in4"></span><span class="keyword">if</span> (! <span class="var">to</span>) {<br/>
+<span class="in4"></span><span class="keyword">if</span> (! <span class="var">top</span>) {<br/>
 <span class="in5"></span><span class="fn">fail</span>(<span class="str">"no to position "</span> + <span class="fn">to_str</span>(<span class="var">to</span> &gt;&gt; <span class="num">3</span>) + <span class="str">", "</span> + <span class="fn">to_str</span>(<span class="var">to</span> % <span class="num">8</span>));<br/>
 <span class="in4"></span>}<br/>
 <span class="in4"></span><span class="keyword">if</span> (<span class="var">from_piece</span>-&gt;<span class="fn">pawn</span>() &amp;&amp; (<span class="var">top</span>.<span class="fn">rank</span>() == <span class="num">1</span> || <span class="var">top</span>.<span class="fn">rank</span>() == <span class="num">8</span>)) {<br/>
@@ -1598,7 +1598,7 @@
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">3</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xd2</span>:<br/>
-<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">6</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xd4</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">1</span>, <span class="num">7</span>, <span class="num">6</span>);<br/>

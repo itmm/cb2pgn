@@ -1153,7 +1153,7 @@ static short MoveNumberLookup[256] = {
 			std::cout << (1 + (nr >> 1)) << ". ";
 		}
 		//std::cout << '[' << count << ", " << len << ", " << nr << "] ";
-		//std::cout << '{' << std::hex << ch << std::dec << "} ";
+		std::cout << '{' << std::hex << ch << std::dec << "} ";
 
 		switch (ch) {
 			case 0x02:
@@ -1227,7 +1227,7 @@ static short MoveNumberLookup[256] = {
 					fail("no from piece at: " + (std::string) Position { (from >> 3) + 1, from % 8 + 1 });
 				}
 				Position top { (to >> 3) + 1, to % 8 + 1};
-				if (! to) {
+				if (! top) {
 					fail("no to position " + to_str(to >> 3) + ", " + to_str(to % 8));
 				}
 				if (from_piece->pawn() && (top.rank() == 1 || top.rank() == 8)) {
@@ -1545,7 +1545,7 @@ static short MoveNumberLookup[256] = {
 				move_queen(1, 0, 3);
 				break;
 			case 0xd2:
-				move_queen(1, 0, 6);
+				move_queen(1, 6, 0);
 				break;
 			case 0xd4:
 				move_knight(1, 7, 6);
