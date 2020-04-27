@@ -200,8 +200,13 @@
 ```
 @add(process game) {
 	int round { main_entry[29] };
-	std::cout << "[Round \"" <<
-		(round ? to_str(round) : "?") << "\"]\n";
+	std::cout << "[Round \"";
+	std::cout << (round ? to_str(round) : "?");
+	int sub_round { main_entry[30] };
+	if (sub_round) {
+		std::cout << "." << sub_round;
+	}
+	std::cout << "\"]\n";
 } @end(process game)
 ```
 

@@ -229,8 +229,13 @@
 <code>
 <span class="macro">@add(<span class="name">process game</span>)</span> {<br/>
 <span class="in1"></span><span class="type">int</span> <span class="var">round</span> { <span class="var">main_entry</span>[<span class="num">29</span>] };<br/>
-<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Round \""</span> &lt;&lt;<br/>
-<span class="in2"></span>(<span class="var">round</span> ? <span class="fn">to_str</span>(<span class="var">round</span>) : <span class="str">"?"</span>) &lt;&lt; <span class="str">"\"]\n"</span>;<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Round \""</span>;<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; (<span class="var">round</span> ? <span class="fn">to_str</span>(<span class="var">round</span>) : <span class="str">"?"</span>);<br/>
+<span class="in1"></span><span class="type">int</span> <span class="var">sub_round</span> { <span class="var">main_entry</span>[<span class="num">30</span>] };<br/>
+<span class="in1"></span><span class="keyword">if</span> (<span class="var">sub_round</span>) {<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"."</span> &lt;&lt; <span class="var">sub_round</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"\"]\n"</span>;<br/>
 } <span class="macro">@end(<span class="name">process game</span>)</span><br/>
 </code></div>
 </div>

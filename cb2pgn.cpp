@@ -55,7 +55,7 @@
 		) : placeholder;
 	}
 
-#line 209 "index.md"
+#line 214 "index.md"
 
 	void print_player(std::ifstream &in, int nr) {
 		if (! in.seekg(32 + 67 * nr, std::ifstream::beg)) {
@@ -76,7 +76,7 @@
 		}
 	}
 
-#line 268 "index.md"
+#line 273 "index.md"
 
 	int get_int(
 		std::istream &in, int len = 4
@@ -89,7 +89,7 @@
 		return result;
 	}
 
-#line 283 "index.md"
+#line 288 "index.md"
 
 	#include <memory>
 
@@ -659,7 +659,7 @@
 		}
 	}
 
-#line 861 "index.md"
+#line 866 "index.md"
 
 	void test_1_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -687,7 +687,7 @@
 		}
 	}
 
-#line 900 "index.md"
+#line 905 "index.md"
 
 	void test_2_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -702,7 +702,7 @@
 		}
 	}
 
-#line 928 "index.md"
+#line 933 "index.md"
 
 	void test_8_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -729,7 +729,7 @@
 		}
 	}
 
-#line 964 "index.md"
+#line 969 "index.md"
 
 	void test_add(const Position &p, int f, int r, const std::string &exp) {
 		Position q { p + Position { f, r } };
@@ -739,7 +739,7 @@
 		}
 	}
 
-#line 985 "index.md"
+#line 990 "index.md"
 
 	bool move_piece(std::ostream &out, Piece *(Board::*fn)(int, bool) const, int nr, int f, int r) {
 		Piece *from { (brd.*fn)(nr, false) };
@@ -754,7 +754,7 @@
 		return true;
 	}
 
-#line 1002 "index.md"
+#line 1007 "index.md"
 
 	void move_king(std::ostream &out, int f, int r) {
 		if (! move_piece(out, &Board::king, 1, f, r)) {
@@ -762,7 +762,7 @@
 		}
 	}
 
-#line 1012 "index.md"
+#line 1017 "index.md"
 
 	void move_queen(std::ostream &out, int nr, int f, int r) {
 		if (! move_piece(out, &Board::queen, nr, f, r)) {
@@ -770,7 +770,7 @@
 		}
 	}
 
-#line 1022 "index.md"
+#line 1027 "index.md"
 
 	void move_rook(std::ostream &out, int nr, int f, int r) {
 		if (! move_piece(out, &Board::rook, nr, f, r)) {
@@ -778,7 +778,7 @@
 		}
 	}
 
-#line 1032 "index.md"
+#line 1037 "index.md"
 
 	void move_bishop(std::ostream &out, int nr, int f, int r) {
 		if (! move_piece(out, &Board::bishop, nr, f, r)) {
@@ -786,7 +786,7 @@
 		}
 	}
 
-#line 1042 "index.md"
+#line 1047 "index.md"
 
 	void move_knight(std::ostream &out, int nr, int f, int r) {
 		if (! move_piece(out, &Board::knight, nr, f, r)) {
@@ -794,7 +794,7 @@
 		}
 	}
 
-#line 1052 "index.md"
+#line 1057 "index.md"
 
 	void move_pawn(std::ostream &out, int nr, int f, int r) {
 		if (! brd.white()) {
@@ -806,7 +806,7 @@
 		}
 	}
 
-#line 1066 "index.md"
+#line 1071 "index.md"
 
 	void Board::kingside_rochade(std::ostream &out) {
 		Piece *kp { king() };
@@ -829,7 +829,7 @@
 		out << "O-O";
 	}
 
-#line 1091 "index.md"
+#line 1096 "index.md"
 
 	void Board::queenside_rochade(std::ostream &out) {
 		Piece *kp { king() };
@@ -852,7 +852,7 @@
 		out << "O-O-O";
 	}
 
-#line 1116 "index.md"
+#line 1121 "index.md"
 
 	#include <sstream>
 
@@ -869,18 +869,18 @@
 #line 44 "index.md"
  {
 	
-#line 855 "index.md"
+#line 860 "index.md"
  
 	Board brd;
 
-#line 891 "index.md"
+#line 896 "index.md"
 
 	test_1_fig(&Board::king, false, "e1");
 	test_1_fig(&Board::king, true, "e8");
 	test_1_fig(&Board::queen, false, "d1");
 	test_1_fig(&Board::queen, true, "d8");
 
-#line 917 "index.md"
+#line 922 "index.md"
 
 	test_2_fig(&Board::rook, false, "a1", "h1");
 	test_2_fig(&Board::rook, true, "a8", "h8");
@@ -889,12 +889,12 @@
 	test_2_fig(&Board::bishop, false, "c1", "f1");
 	test_2_fig(&Board::bishop, true, "c8", "f8");
 
-#line 957 "index.md"
+#line 962 "index.md"
 
 	test_8_fig(&Board::pawn, false, "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2");
 	test_8_fig(&Board::pawn, true, "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7");
 
-#line 976 "index.md"
+#line 981 "index.md"
  {
 	const auto &wk { *brd.king() };
 	test_add(wk, 0, 0, "e1");
@@ -994,10 +994,15 @@
 #line 201 "index.md"
  {
 	int round { main_entry[29] };
-	std::cout << "[Round \"" <<
-		(round ? to_str(round) : "?") << "\"]\n";
+	std::cout << "[Round \"";
+	std::cout << (round ? to_str(round) : "?");
+	int sub_round { main_entry[30] };
+	if (sub_round) {
+		std::cout << "." << sub_round;
+	}
+	std::cout << "\"]\n";
 } 
-#line 232 "index.md"
+#line 237 "index.md"
  {
 	std::cout << "[White \"";
 	print_player(player_file, get_int(main_entry + 9, 3));
@@ -1006,7 +1011,7 @@
 	print_player(player_file, get_int(main_entry + 12, 3));
 	std::cout << "\"]\n";
 } 
-#line 243 "index.md"
+#line 248 "index.md"
 
 	std::string result;
 	switch (main_entry[27]) {
@@ -1022,10 +1027,10 @@
 	std::cout << "[Result \"" <<
 		result << "\"]\n";
 
-#line 261 "index.md"
+#line 266 "index.md"
 
 	
-#line 1122 "index.md"
+#line 1127 "index.md"
  {
 	brd.~Board();
 	new (&brd) Board();
@@ -1866,7 +1871,7 @@ static short MoveNumberLookup[256] = {
 		brd.switch_players();
 	}
 } 
-#line 262 "index.md"
+#line 267 "index.md"
 ;
 	std::cout << result << "\n\n";
 
