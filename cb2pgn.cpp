@@ -313,7 +313,7 @@
 			if (r) { return r; }
 			return black_.find(pos);
 		}
-		void move(Piece *first, Piece *from, const Position &to);
+		void move(std::ostream &out, Piece *first, Piece *from, const Position &to);
 		void switch_players() { 
 			Side *tmp { other_ };
 			other_ = cur_;
@@ -341,8 +341,8 @@
 			}
 			return false;
 		}
-		void kingside_rochade();
-		void queenside_rochade();
+		void kingside_rochade(std::ostream &out);
+		void queenside_rochade(std::ostream &out);
 		void remove(Piece *piece) {
 			if (piece->pawn()) {
 				piece->file(0);
@@ -403,7 +403,7 @@
 		return find(nr, other ? other_->pawns.get() : cur_->pawns.get());
 	}
 
-	void Board::move(Piece *first, Piece *from, const Position &to) {
+	void Board::move(std::ostream &out, Piece *first, Piece *from, const Position &to) {
 		if (! from) {
 			fail("no piece to move from");
 		}
@@ -419,11 +419,11 @@
 			}
 			captures = true;
 		}
-		std::cout << from->name();// << '(' << (std::string) *from << ')';
+		out << from->name();// << '(' << (std::string) *from << ')';
 
 		if (from->pawn()) {
 			if (captures) {
-				std::cout << from->file_str();
+				out << from->file_str();
 			}
 		} else {
 			bool same_f { false };
@@ -438,29 +438,28 @@
 			}
 			if (multiple) {
 				if (! same_f || (same_f && same_r)) {
-					std::cout << from->file_str();
+					out << from->file_str();
 				}
 				if (same_f) {
-					std::cout << from->rank_str();
+					out << from->rank_str();
 				}
 			}
 		}
-		if (captures) { std::cout << "x"; }
+		if (captures) { out << "x"; }
 		if (to_piece) {
 			remove(to_piece);
 			to_piece = nullptr;
 		}
 		from->file(to.file());
 		from->rank(to.rank());
-		std::cout << (std::string) to;
+		out << (std::string) to;
 		if (check()) {
 			if (mate()) {
-				std::cout << '#';
+				out << '#';
 			} else {
-				std::cout << '+';
+				out << '+';
 			}
 		}
-		std::cout << ' ';
 	}
 
 	bool Piece::can_move_to(Board &brd, const Position &to) {
@@ -660,7 +659,7 @@
 		}
 	}
 
-#line 862 "index.md"
+#line 861 "index.md"
 
 	void test_1_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -688,7 +687,7 @@
 		}
 	}
 
-#line 901 "index.md"
+#line 900 "index.md"
 
 	void test_2_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -703,7 +702,7 @@
 		}
 	}
 
-#line 929 "index.md"
+#line 928 "index.md"
 
 	void test_8_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -730,7 +729,7 @@
 		}
 	}
 
-#line 965 "index.md"
+#line 964 "index.md"
 
 	void test_add(const Position &p, int f, int r, const std::string &exp) {
 		Position q { p + Position { f, r } };
@@ -740,9 +739,9 @@
 		}
 	}
 
-#line 986 "index.md"
+#line 985 "index.md"
 
-	bool move_piece(Piece *(Board::*fn)(int, bool) const, int nr, int f, int r) {
+	bool move_piece(std::ostream &out, Piece *(Board::*fn)(int, bool) const, int nr, int f, int r) {
 		Piece *from { (brd.*fn)(nr, false) };
 		if (! from) { fail("no piece to move " + std::to_string(nr)); }
 		Position to { *from + Position { f, r } };
@@ -751,65 +750,65 @@
 		if (! to) {
 			return false;
 		}
-		brd.move((brd.*fn)(1, false), from, to);
+		brd.move(out, (brd.*fn)(1, false), from, to);
 		return true;
 	}
 
-#line 1003 "index.md"
+#line 1002 "index.md"
 
-	void move_king(int f, int r) {
-		if (! move_piece(&Board::king, 1, f, r)) {
+	void move_king(std::ostream &out, int f, int r) {
+		if (! move_piece(out, &Board::king, 1, f, r)) {
 			fail("invalid king move");
 		}
 	}
 
-#line 1013 "index.md"
+#line 1012 "index.md"
 
-	void move_queen(int nr, int f, int r) {
-		if (! move_piece(&Board::queen, nr, f, r)) {
+	void move_queen(std::ostream &out, int nr, int f, int r) {
+		if (! move_piece(out, &Board::queen, nr, f, r)) {
 			fail("invalid queen move " + std::to_string(nr));
 		}
 	}
 
-#line 1023 "index.md"
+#line 1022 "index.md"
 
-	void move_rook(int nr, int f, int r) {
-		if (! move_piece(&Board::rook, nr, f, r)) {
+	void move_rook(std::ostream &out, int nr, int f, int r) {
+		if (! move_piece(out, &Board::rook, nr, f, r)) {
 			fail("invalid rook move " + std::to_string(nr));
 		}
 	}
 
-#line 1033 "index.md"
+#line 1032 "index.md"
 
-	void move_bishop(int nr, int f, int r) {
-		if (! move_piece(&Board::bishop, nr, f, r)) {
+	void move_bishop(std::ostream &out, int nr, int f, int r) {
+		if (! move_piece(out, &Board::bishop, nr, f, r)) {
 			fail("invalid bishop move " + std::to_string(nr));
 		}
 	}
 
-#line 1043 "index.md"
+#line 1042 "index.md"
 
-	void move_knight(int nr, int f, int r) {
-		if (! move_piece(&Board::knight, nr, f, r)) {
+	void move_knight(std::ostream &out, int nr, int f, int r) {
+		if (! move_piece(out, &Board::knight, nr, f, r)) {
 			fail("invalid knight move " + std::to_string(nr));
 		}
 	}
 
-#line 1053 "index.md"
+#line 1052 "index.md"
 
-	void move_pawn(int nr, int f, int r) {
+	void move_pawn(std::ostream &out, int nr, int f, int r) {
 		if (! brd.white()) {
 			r = 8 - r;
 			f = f ? 8 - f : 0;
 		}
-		if (! move_piece(&Board::pawn, nr, f, r)) {
+		if (! move_piece(out, &Board::pawn, nr, f, r)) {
 			fail("invalid pawn move " + std::to_string(nr) + ", " + std::to_string(f) + ", " + std::to_string(r));
 		}
 	}
 
-#line 1067 "index.md"
+#line 1066 "index.md"
 
-	void Board::kingside_rochade() {
+	void Board::kingside_rochade(std::ostream &out) {
 		Piece *kp { king() };
 		int kf { kp->file() };
 		int mf { 9 };
@@ -827,19 +826,12 @@
 		}
 		r->file(kf + 1);
 		kp->file(kf + 2);
-		std::cout << "O-O ";
-		/*
-		std::cout << "{ " << (std::string) *kp << " ";
-		for (Piece *cur { cur_->rooks.get() }; cur; cur = cur->next()) {
-			std::cout << (std::string) *cur << ' ';
-		}
-		std::cout << "} ";
-		*/
+		out << "O-O";
 	}
 
-#line 1099 "index.md"
+#line 1091 "index.md"
 
-	void Board::queenside_rochade() {
+	void Board::queenside_rochade(std::ostream &out) {
 		Piece *kp { king() };
 		int kf { kp->file() };
 		int mf { 0 };
@@ -857,15 +849,12 @@
 		}
 		r->file(kf - 1);
 		kp->file(kf - 2);
-		std::cout << "O-O-O ";
-		/*	
-		std::cout << "{ " << (std::string) *kp << " ";
-		for (Piece *cur { cur_->rooks.get() }; cur; cur = cur->next()) {
-			std::cout << (std::string) *cur << ' ';
-		}
-		std::cout << "} ";
-		*/
+		out << "O-O-O";
 	}
+
+#line 1116 "index.md"
+
+	#include <sstream>
 
 #line 6 "index.md"
 ;
@@ -880,18 +869,18 @@
 #line 44 "index.md"
  {
 	
-#line 856 "index.md"
+#line 855 "index.md"
  
 	Board brd;
 
-#line 892 "index.md"
+#line 891 "index.md"
 
 	test_1_fig(&Board::king, false, "e1");
 	test_1_fig(&Board::king, true, "e8");
 	test_1_fig(&Board::queen, false, "d1");
 	test_1_fig(&Board::queen, true, "d8");
 
-#line 918 "index.md"
+#line 917 "index.md"
 
 	test_2_fig(&Board::rook, false, "a1", "h1");
 	test_2_fig(&Board::rook, true, "a8", "h8");
@@ -900,12 +889,12 @@
 	test_2_fig(&Board::bishop, false, "c1", "f1");
 	test_2_fig(&Board::bishop, true, "c8", "f8");
 
-#line 958 "index.md"
+#line 957 "index.md"
 
 	test_8_fig(&Board::pawn, false, "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2");
 	test_8_fig(&Board::pawn, true, "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7");
 
-#line 977 "index.md"
+#line 976 "index.md"
  {
 	const auto &wk { *brd.king() };
 	test_add(wk, 0, 0, "e1");
@@ -1036,7 +1025,7 @@
 #line 261 "index.md"
 
 	
-#line 1131 "index.md"
+#line 1122 "index.md"
  {
 	brd.~Board();
 	new (&brd) Board();
@@ -1089,122 +1078,123 @@ static short MoveNumberLookup[256] = {
     0x28, 0x7e, 0x61, 0x39, 0xe1, 0xdb, 0x69, 0x80, // 248 - 255
  	};
 	std::cout << "\n";
+	int chrs { 1000 };
 	for (int count { 0 }, nr { 0 }; len; ++count, ++nr, --len) {
 		int ch { (game_file.get() - count) & 0xff };
 		if (ch == 0x0c) {
 			break;
 		}
+		std::ostringstream out;
 		if (! (nr & 1)) {
-			std::cout << (1 + (nr >> 1)) << ". ";
+			out << (1 + (nr >> 1)) << ". ";
 		}
-		//std::cout << '[' << count << ", " << len << ", " << nr << "] ";
-		//std::cout << '{' << std::hex << ch << std::dec << "} ";
+		//out << '{' << std::hex << ch << std::dec << "} ";
 
 		switch (ch) {
 			case 0x00:
-				move_queen(2, 6, 6);
+				move_queen(out, 2, 6, 6);
 				break;
 			case 0x01:
-				move_queen(2, 0, 7);
+				move_queen(out, 2, 0, 7);
 				break;
 			case 0x02:
-				move_bishop(1, 1, 1);
+				move_bishop(out, 1, 1, 1);
 				break;
 			case 0x04:
-				move_queen(3, 2, 6);
+				move_queen(out, 3, 2, 6);
 				break;
 			case 0x05:
-				move_rook(2, 2, 0);
+				move_rook(out, 2, 2, 0);
 				break;
 			case 0x06:
-				move_bishop(1, 1, 7);
+				move_bishop(out, 1, 1, 7);
 				break;
 			case 0x07:
-				move_knight(2, 7, 6);
+				move_knight(out, 2, 7, 6);
 				break;
 			case 0x08:
-				move_bishop(2, 3, 3);
+				move_bishop(out, 2, 3, 3);
 				break;
 			case 0x09:
-				move_pawn(6, 0, 1);
+				move_pawn(out, 6, 0, 1);
 				break;
 			case 0x0a:
-				move_rook(3, 0, 6);
+				move_rook(out, 3, 0, 6);
 				break;
 			case 0x0b:
-				move_pawn(4, 0, 2);
+				move_pawn(out, 4, 0, 2);
 				break;
 			case 0x0d:
-				move_queen(3, 0, 4);
+				move_queen(out, 3, 0, 4);
 				break;
 			case 0x0e:
-				move_knight(2, 1, 2);
+				move_knight(out, 2, 1, 2);
 				break;
 			case 0x0f:
-				move_queen(3, 0, 3);
+				move_queen(out, 3, 0, 3);
 				break;
 			case 0x10:
-				move_rook(3, 4, 0);
+				move_rook(out, 3, 4, 0);
 				break;
 			case 0x11:
-				move_queen(2, 0, 4);
+				move_queen(out, 2, 0, 4);
 				break;
 			case 0x12:
-				move_pawn(8, 0, 1);
+				move_pawn(out, 8, 0, 1);
 				break;
 			case 0x13:
-				move_pawn(8, 1, 1);
+				move_pawn(out, 8, 1, 1);
 				break;
 			case 0x14:
-				move_rook(2, 0, 1);
+				move_rook(out, 2, 0, 1);
 				break;
 			case 0x15:
-				move_pawn(5, 1, 1);
+				move_pawn(out, 5, 1, 1);
 				break;
 			case 0x16:
-				move_bishop(2, 7, 1);
+				move_bishop(out, 2, 7, 1);
 				break;
 			case 0x17:
-				move_pawn(2, 0, 2);
+				move_pawn(out, 2, 0, 2);
 				break;
 			case 0x18:
-				move_queen(1, 7, 1);
+				move_queen(out, 1, 7, 1);
 				break;
 			case 0x19:
-				move_pawn(8, 7, 1);
+				move_pawn(out, 8, 7, 1);
 				break;
 			case 0x1a:
-				move_queen(3, 0, 1);
+				move_queen(out, 3, 0, 1);
 				break;
 			case 0x1b:
-				move_rook(3, 0, 4);
+				move_rook(out, 3, 0, 4);
 				break;
 			case 0x1d:
-				move_queen(2, 5, 0);
+				move_queen(out, 2, 5, 0);
 				break;
 			case 0x1f:
-				move_queen(2, 4, 4);
+				move_queen(out, 2, 4, 4);
 				break;
 			case 0x20:
-				move_queen(2, 2, 6);
+				move_queen(out, 2, 2, 6);
 				break;
 			case 0x21:
-				move_queen(1, 4, 0);
+				move_queen(out, 1, 4, 0);
 				break;
 			case 0x23:
-				move_queen(3, 0, 7);
+				move_queen(out, 3, 0, 7);
 				break;
 			case 0x24:
-				move_queen(1, 6, 6);
+				move_queen(out, 1, 6, 6);
 				break;
 			case 0x26:
-				move_rook(1, 3, 0);
+				move_rook(out, 1, 3, 0);
 				break;
 			case 0x27:
-				move_knight(3, 2, 7);
+				move_knight(out, 3, 2, 7);
 				break;
 			case 0x28:
-				move_queen(1, 3, 5);
+				move_queen(out, 1, 3, 5);
 				break;
 			case 0x29: {
 				int mv { MoveNumberLookup[(game_file.get() - count) & 0xff] };
@@ -1222,7 +1212,7 @@ static short MoveNumberLookup[256] = {
 				}
 				if (from_piece->pawn() && (top.rank() == 1 || top.rank() == 8)) {
 					if (top.file() != from_piece->file()) {
-						std::cout << from_piece->file_str() << 'x';
+						out << from_piece->file_str() << 'x';
 						Piece *old = brd.get(top);
 						if (old) { brd.remove(old); }
 					}
@@ -1245,618 +1235,617 @@ static short MoveNumberLookup[256] = {
 						default:
 							fail("unknown promotion piece " + to_str(prom));
 					}
-					std::cout << (std::string) top << "=" << to_piece->name();
+					out << (std::string) top << "=" << to_piece->name();
 					if (brd.check()) {
 						if (brd.mate()) {
-							std::cout << '#';
+							out << '#';
 						} else {
-							std::cout << '+';
+							out << '+';
 						}
 					}
-					std::cout << " ";
 					break;
 				}
-				brd.move(brd.first(*from_piece), from_piece, top);
+				brd.move(out, brd.first(*from_piece), from_piece, top);
 				break;
 			}
 			case 0x2a:
-				move_queen(2, 4, 4);
+				move_queen(out, 2, 4, 4);
 				break;
 			case 0x2b:
-				move_rook(3, 0, 7);
+				move_rook(out, 3, 0, 7);
 				break;
 			case 0x2c:
-				move_bishop(1, 5, 3);
+				move_bishop(out, 1, 5, 3);
 				break;
 			case 0x2d:
-				move_pawn(1, 0, 1);
+				move_pawn(out, 1, 0, 1);
 				break;
 			case 0x2e:
-				move_rook(1, 1, 0);
+				move_rook(out, 1, 1, 0);
 				break;
 			case 0x2f:
-				move_queen(1, 5, 3);
+				move_queen(out, 1, 5, 3);
 				break;
 			case 0x30:
-				move_rook(1, 5, 0);
+				move_rook(out, 1, 5, 0);
 				break;
 			case 0x31:
-				move_queen(2, 0, 6);
+				move_queen(out, 2, 0, 6);
 				break;
 			case 0x32:
-				move_rook(2, 6, 0);
+				move_rook(out, 2, 6, 0);
 				break;
 			case 0x33:
-				move_pawn(8, 0, 2);
+				move_pawn(out, 8, 0, 2);
 				break;
 			case 0x34:
-				move_knight(2, 2, 7);
+				move_knight(out, 2, 2, 7);
 				break;
 			case 0x35:
-				move_bishop(2, 1, 7);
+				move_bishop(out, 2, 1, 7);
 				break;
 			case 0x36:
-				move_pawn(5, 7, 1);
+				move_pawn(out, 5, 7, 1);
 				break;
 			case 0x37:
-				move_bishop(1, 7, 1);
+				move_bishop(out, 1, 7, 1);
 				break;
 			case 0x38:
-				move_queen(3, 3, 3);
+				move_queen(out, 3, 3, 3);
 				break;
 			case 0x39:
-				move_king(1, 1);
+				move_king(out, 1, 1);
 				break;
 			case 0x3a:
-				move_pawn(7, 7, 1);
+				move_pawn(out, 7, 7, 1);
 				break;
 			case 0x3b:
-				move_bishop(3, 4, 4);
+				move_bishop(out, 3, 4, 4);
 				break;
 			case 0x3d:
-				move_knight(1, 1, 2);
+				move_knight(out, 1, 1, 2);
 				break;
 			case 0x3e:
-				move_bishop(3, 3, 5);
+				move_bishop(out, 3, 3, 5);
 				break;
 			case 0x3f:
-				move_bishop(2, 2, 2);
+				move_bishop(out, 2, 2, 2);
 				break;
 			case 0x40:
-				move_queen(3, 2, 2);
+				move_queen(out, 3, 2, 2);
 				break;
 			case 0x41:
-				move_bishop(1, 4, 4);
+				move_bishop(out, 1, 4, 4);
 				break;
 			case 0x42:
-				move_queen(3, 0, 2);
+				move_queen(out, 3, 0, 2);
 				break;
 			case 0x43:
-				move_rook(1, 0, 3);
+				move_rook(out, 1, 0, 3);
 				break;
 			case 0x44:
-				move_queen(2, 1, 1);
+				move_queen(out, 2, 1, 1);
 				break;
 			case 0x45:
-				move_bishop(3, 3, 3);
+				move_bishop(out, 3, 3, 3);
 				break;
 			case 0x46:
-				move_bishop(3, 4, 4);
+				move_bishop(out, 3, 4, 4);
 				break;
 			case 0x47:
-				move_king(-1, 1);
+				move_king(out, -1, 1);
 				break;
 			case 0x48:
-				move_queen(1, 2, 6);
+				move_queen(out, 1, 2, 6);
 				break;
 			case 0x49:
-				move_king(0, 1);
+				move_king(out, 0, 1);
 				break;
 			case 0x4a:
-				move_knight(1, 2, 7);
+				move_knight(out, 1, 2, 7);
 				break;
 			case 0x4b:
-				move_queen(2, 7, 7);
+				move_queen(out, 2, 7, 7);
 				break;
 			case 0x4d:
-				move_queen(1, 1, 1);
+				move_queen(out, 1, 1, 1);
 				break;
 			case 0x4e:
-				move_rook(1, 0, 1);
+				move_rook(out, 1, 0, 1);
 				break;
 			case 0x4f:
-				move_queen(3, 4, 0);
+				move_queen(out, 3, 4, 0);
 				break;
 			case 0x50:
-				move_queen(2, 0, 3);
+				move_queen(out, 2, 0, 3);
 				break;
 			case 0x51:
-				move_bishop(3, 1, 1);
+				move_bishop(out, 3, 1, 1);
 				break;
 			case 0x52:
-				move_rook(2, 7, 0);
+				move_rook(out, 2, 7, 0);
 				break;
 			case 0x53:
-				move_queen(1, 0, 4);
+				move_queen(out, 1, 0, 4);
 				break;
 			case 0x54:
-				move_queen(3, 3, 0);
+				move_queen(out, 3, 3, 0);
 				break;
 			case 0x55:
-				move_bishop(1, 3, 5);
+				move_bishop(out, 1, 3, 5);
 				break;
 			case 0x56:
-				move_bishop(3, 5, 5);
+				move_bishop(out, 3, 5, 5);
 				break;
 			case 0x57:
-				move_queen(1, 7, 0);
+				move_queen(out, 1, 7, 0);
 				break;
 			case 0x58:
-				move_knight(1, 2, 1);
+				move_knight(out, 1, 2, 1);
 				break;
 			case 0x59:
-				move_queen(3, 4, 4);
+				move_queen(out, 3, 4, 4);
 				break;
 			case 0x5a:
-				move_queen(1, 6, 2);
+				move_queen(out, 1, 6, 2);
 				break;
 			case 0x5b:
-				move_queen(2, 3, 5);
+				move_queen(out, 2, 3, 5);
 				break;
 			case 0x5c:
-				move_queen(2, 1, 0);
+				move_queen(out, 2, 1, 0);
 				break;
 			case 0x5d:
-				move_king(1, -1);
+				move_king(out, 1, -1);
 				break;
 			case 0x5e:
-				move_bishop(2, 6, 6);
+				move_bishop(out, 2, 6, 6);
 				break;
 			case 0x5f:
-				move_knight(2, 6, 1);
+				move_knight(out, 2, 6, 1);
 				break;
 			case 0x60:
-				move_queen(2, 7, 1);
+				move_queen(out, 2, 7, 1);
 				break;
 			case 0x61:
-				move_rook(1, 6, 0);
+				move_rook(out, 1, 6, 0);
 				break;
 			case 0x62:
-				move_queen(1, 4, 4);
+				move_queen(out, 1, 4, 4);
 				break;
 			case 0x63:
-				move_rook(1, 0, 5);
+				move_rook(out, 1, 0, 5);
 				break;
 			case 0x64:
-				move_pawn(2, 0, 1);
+				move_pawn(out, 2, 0, 1);
 				break;
 			case 0x66:
-				move_bishop(3, 2, 6);
+				move_bishop(out, 3, 2, 6);
 				break;
 			case 0x67:
-				move_queen(2, 1, 7);
+				move_queen(out, 2, 1, 7);
 				break;
 			case 0x68:
-				move_rook(2, 0, 3);
+				move_rook(out, 2, 0, 3);
 				break;
 			case 0x69:
-				move_rook(3, 6, 0);
+				move_rook(out, 3, 6, 0);
 				break;
 			case 0x6a:
-				move_queen(3, 6, 2);
+				move_queen(out, 3, 6, 2);
 				break;
 			case 0x6b:
-				move_queen(1, 0, 6);
+				move_queen(out, 1, 0, 6);
 				break;
 			case 0x6c:
-				move_queen(3, 7, 7);
+				move_queen(out, 3, 7, 7);
 				break;
 			case 0x6d:
-				move_bishop(2, 3, 5);
+				move_bishop(out, 2, 3, 5);
 				break;
 			case 0x6e:
-				move_queen(1, 4, 4);
+				move_queen(out, 1, 4, 4);
 				break;
 			case 0x6f:
-				move_rook(1, 7, 0);
+				move_rook(out, 1, 7, 0);
 				break;
 			case 0x70:
-				move_pawn(2, 1, 1);
+				move_pawn(out, 2, 1, 1);
 				break;
 			case 0x71:
-				move_bishop(2, 4, 4);
+				move_bishop(out, 2, 4, 4);
 				break;
 			case 0x72:
-				move_queen(3, 7, 0);
+				move_queen(out, 3, 7, 0);
 				break;
 			case 0x73:
-				move_bishop(2, 5, 5);
+				move_bishop(out, 2, 5, 5);
 				break;
 			case 0x74:
-				move_rook(3, 5, 0);
+				move_rook(out, 3, 5, 0);
 				break;
 			case 0x75:
-				move_knight(2, 6, 7);
+				move_knight(out, 2, 6, 7);
 				break;
 			case 0x76:
-				brd.kingside_rochade();
+				brd.kingside_rochade(out);
 				break;
 			case 0x77:
-				move_rook(2, 0, 6);
+				move_rook(out, 2, 0, 6);
 				break;
 			case 0x78:
-				move_bishop(2, 7, 7);
+				move_bishop(out, 2, 7, 7);
 				break;
 			case 0x79:
-				move_queen(1, 1, 0);
+				move_queen(out, 1, 1, 0);
 				break;
 			case 0x7a:
-				move_queen(3, 2, 0);
+				move_queen(out, 3, 2, 0);
 				break;
 			case 0x7b:
-				move_pawn(3, 0, 1);
+				move_pawn(out, 3, 0, 1);
 				break;
 			case 0x7c:
-				move_bishop(1, 6, 6);
+				move_bishop(out, 1, 6, 6);
 				break;
 			case 0x7d:
-				move_pawn(6, 1, 1);
+				move_pawn(out, 6, 1, 1);
 				break;
 			case 0x7e:
-				move_queen(2, 6, 0);
+				move_queen(out, 2, 6, 0);
 				break;
 			case 0x7f:
-				move_queen(1, 0, 5);
+				move_queen(out, 1, 0, 5);
 				break;
 			case 0x80:
-				move_queen(2, 2, 2);
+				move_queen(out, 2, 2, 2);
 				break;
 			case 0x81:
-				move_rook(3, 0, 1);
+				move_rook(out, 3, 0, 1);
 				break;
 			case 0x82:
-				move_rook(3, 0, 2);
+				move_rook(out, 3, 0, 2);
 				break;
 			case 0x83:
-				move_queen(2, 5, 5);
+				move_queen(out, 2, 5, 5);
 				break;
 			case 0x84:
-				move_pawn(5, 0, 1);
+				move_pawn(out, 5, 0, 1);
 				break;
 			case 0x85:
-				move_pawn(3, 7, 1);
+				move_pawn(out, 3, 7, 1);
 				break;
 			case 0x86:
-				move_queen(3, 1, 7);
+				move_queen(out, 3, 1, 7);
 				break;
 			case 0x87:
-				move_queen(3, 5, 5);
+				move_queen(out, 3, 5, 5);
 				break;
 			case 0x88:
-				move_rook(1, 4, 0);
+				move_rook(out, 1, 4, 0);
 				break;
 			case 0x89:
-				move_knight(2, 1, 6);
+				move_knight(out, 2, 1, 6);
 				break;
 			case 0x8b:
-				move_rook(2, 3, 0);
+				move_rook(out, 2, 3, 0);
 				break;
 			case 0x8c:
-				move_queen(3, 4, 4);
+				move_queen(out, 3, 4, 4);
 				break;
 			case 0x8d:
-				move_queen(1, 0, 7);
+				move_queen(out, 1, 0, 7);
 				break;
 			case 0x8e:
-				move_pawn(1, 1, 1);
+				move_pawn(out, 1, 1, 1);
 				break;
 			case 0x8f:
-				move_rook(3, 1, 0);
+				move_rook(out, 3, 1, 0);
 				break;
 			case 0x90:
-				move_pawn(4, 1, 1);
+				move_pawn(out, 4, 1, 1);
 				break;
 			case 0x91:
-				move_bishop(3, 6, 6);
+				move_bishop(out, 3, 6, 6);
 				break;
 			case 0x92:
-				move_queen(2, 5, 3);
+				move_queen(out, 2, 5, 3);
 				break;
 			case 0x93:
-				move_bishop(2, 4, 4);
+				move_bishop(out, 2, 4, 4);
 				break;
 			case 0x94:
-				move_queen(2, 0, 2);
+				move_queen(out, 2, 0, 2);
 				break;
 			case 0x95:
-				move_queen(2, 2, 0);
+				move_queen(out, 2, 2, 0);
 				break;
 			case 0x96:
-				move_queen(1, 7, 7);
+				move_queen(out, 1, 7, 7);
 				break;
 			case 0x97:
-				move_bishop(1, 2, 2);
+				move_bishop(out, 1, 2, 2);
 				break;
 			case 0x98:
-				move_rook(2, 5, 0);
+				move_rook(out, 2, 5, 0);
 				break;
 			case 0x99:
-				move_queen(1, 5, 0);
+				move_queen(out, 1, 5, 0);
 				break;
 			case 0x9a:
-				move_rook(3, 0, 3);
+				move_rook(out, 3, 0, 3);
 				break;
 			case 0x9b:
-				move_knight(3, 2, 1);
+				move_knight(out, 3, 2, 1);
 				break;
 			case 0x9c:
-				move_rook(1, 0, 6);
+				move_rook(out, 1, 0, 6);
 				break;
 			case 0x9d:
-				move_rook(3, 0, 5);
+				move_rook(out, 3, 0, 5);
 				break;
 			case 0x9e:
-				move_pawn(6, 0, 2);
+				move_pawn(out, 6, 0, 2);
 				break;
 			case 0xa0:
-				move_queen(2, 3, 3);
+				move_queen(out, 2, 3, 3);
 				break;
 			case 0xa1:
-				move_rook(2, 4, 0);
+				move_rook(out, 2, 4, 0);
 				break;
 			case 0xa3:
-				move_knight(3, 6, 1);
+				move_knight(out, 3, 6, 1);
 				break;
 			case 0xa2:
-				move_bishop(2, 5, 3);
+				move_bishop(out, 2, 5, 3);
 				break;
 			case 0xa4:
-				move_pawn(2, 7, 1);
+				move_pawn(out, 2, 7, 1);
 				break;
 			case 0xa5:
-				move_queen(1, 0, 1);
+				move_queen(out, 1, 0, 1);
 				break;
 			case 0xa6:
-				move_rook(2, 1, 0);
+				move_rook(out, 2, 1, 0);
 				break;
 			case 0xa7:
-				move_queen(1, 1, 7);
+				move_queen(out, 1, 1, 7);
 				break;
 			case 0xa8:
-				move_queen(3, 6, 0);
+				move_queen(out, 3, 6, 0);
 				break;
 			case 0xa9:
-				move_rook(2, 0, 2);
+				move_rook(out, 2, 0, 2);
 				break;
 			case 0xaa:
 				break;
 			case 0xab:
-				move_bishop(3, 1, 7);
+				move_bishop(out, 3, 1, 7);
 				break;
 			case 0xac:
-				move_knight(3, 6, 7);
+				move_knight(out, 3, 6, 7);
 				break;
 			case 0xae:
-				move_bishop(1, 6, 2);
+				move_bishop(out, 1, 6, 2);
 				break;
 			case 0xb0:
-				move_queen(3, 0, 5);
+				move_queen(out, 3, 0, 5);
 				break;
 			case 0xb1:
-				move_king(-1, -1);
+				move_king(out, -1, -1);
 				break;
 			case 0xb2:
-				move_king(-1, 0);
+				move_king(out, -1, 0);
 				break;
 			case 0xb3:
-				move_bishop(3, 5, 3);
+				move_bishop(out, 3, 5, 3);
 				break;
 			case 0xb4:
-				move_queen(1, 2, 2);
+				move_queen(out, 1, 2, 2);
 				break;
 			case 0xb5:
-				brd.queenside_rochade();
+				brd.queenside_rochade(out);
 				break;
 			case 0xb6:
-				move_queen(2, 6, 2);
+				move_queen(out, 2, 6, 2);
 				break;
 			case 0xb7:
-				move_bishop(1, 2, 6);
+				move_bishop(out, 1, 2, 6);
 				break;
 			case 0xb8:
-				move_queen(1, 0, 2);
+				move_queen(out, 1, 0, 2);
 				break;
 			case 0xb9:
-				move_bishop(3, 2, 2);
+				move_bishop(out, 3, 2, 2);
 				break;
 			case 0xba:
-				move_knight(1, 6, 7);
+				move_knight(out, 1, 6, 7);
 				break;
 			case 0xbb:
-				move_pawn(7, 0, 1);
+				move_pawn(out, 7, 0, 1);
 				break;
 			case 0xbc:
-				move_pawn(7, 1, 1);
+				move_pawn(out, 7, 1, 1);
 				break;
 			case 0xbd:
-				move_queen(1, 5, 5);
+				move_queen(out, 1, 5, 5);
 				break;
 			case 0xbe:
-				move_queen(1, 2, 0);
+				move_queen(out, 1, 2, 0);
 				break;
 			case 0xbf:
-				move_queen(1, 3, 3);
+				move_queen(out, 1, 3, 3);
 				break;
 			case 0xc0:
-				move_knight(3, 1, 2);
+				move_knight(out, 3, 1, 2);
 				break;
 			case 0xc1:
-				move_pawn(1, 0, 2);
+				move_pawn(out, 1, 0, 2);
 				break;
 			case 0xc2:
-				move_king(0, -1);
+				move_king(out, 0, -1);
 				break;
 			case 0xc3:
-				move_bishop(1, 5, 5);
+				move_bishop(out, 1, 5, 5);
 				break;
 			case 0xc4:
-				move_knight(2, 2, 1);
+				move_knight(out, 2, 2, 1);
 				break;
 			case 0xc5:
-				move_pawn(4, 0, 1);
+				move_pawn(out, 4, 0, 1);
 				break;
 			case 0xc6:
-				move_rook(1, 2, 0);
+				move_rook(out, 1, 2, 0);
 				break;
 			case 0xc8:
-				move_bishop(3, 7, 1);
+				move_bishop(out, 3, 7, 1);
 				break;
 			case 0xc9:
-				move_knight(3, 7, 6);
+				move_knight(out, 3, 7, 6);
 				break;
 			case 0xca:
-				move_queen(2, 3, 0);
+				move_queen(out, 2, 3, 0);
 				break;
 			case 0xcb:
-				move_queen(1, 0, 3);
+				move_queen(out, 1, 0, 3);
 				break;
 			case 0xcd:
-				move_rook(3, 2, 0);
+				move_rook(out, 3, 2, 0);
 				break;
 			case 0xce:
-				move_queen(3, 5, 3);
+				move_queen(out, 3, 5, 3);
 				break;
 			case 0xd1:
-				move_queen(3, 0, 6);
+				move_queen(out, 3, 0, 6);
 				break;
 			case 0xd2:
-				move_queen(1, 6, 0);
+				move_queen(out, 1, 6, 0);
 				break;
 			case 0xd3:
-				move_queen(2, 4, 0);
+				move_queen(out, 2, 4, 0);
 				break;
 			case 0xd4:
-				move_knight(1, 7, 6);
+				move_knight(out, 1, 7, 6);
 				break;
 			case 0xd6:
-				move_rook(3, 7, 0);
+				move_rook(out, 3, 7, 0);
 				break;
 			case 0xd7:
-				move_rook(1, 0, 4);
+				move_rook(out, 1, 0, 4);
 				break;
 			case 0xd8:
-				move_king(1, 0);
+				move_king(out, 1, 0);
 				break;
 			case 0xd9:
-				move_bishop(1, 4, 4);
+				move_bishop(out, 1, 4, 4);
 				break;
 			case 0xdb:
-				move_queen(3, 7, 1);
+				move_queen(out, 3, 7, 1);
 				break;
 			case 0xde:
-				move_pawn(6, 7, 1);
+				move_pawn(out, 6, 7, 1);
 				break;
 			case 0xda:
-				move_pawn(3, 0, 2);
+				move_pawn(out, 3, 0, 2);
 				break;
 			case 0xdd:
-				move_knight(1, 1, 6);
+				move_knight(out, 1, 1, 6);
 				break;
 			case 0xdf:
-				move_pawn(7, 0, 2);
+				move_pawn(out, 7, 0, 2);
 				break;
 			case 0xe0:
-				move_pawn(3, 1, 1);
+				move_pawn(out, 3, 1, 1);
 				break;
 			case 0xe1:
-				move_bishop(1, 3, 3);
+				move_bishop(out, 1, 3, 3);
 				break;
 			case 0xe2:
-				move_rook(2, 0, 7);
+				move_rook(out, 2, 0, 7);
 				break;
 			case 0xe3:
-				move_knight(3, 7, 2);
+				move_knight(out, 3, 7, 2);
 				break;
 			case 0xe4:
-				move_bishop(1, 7, 7);
+				move_bishop(out, 1, 7, 7);
 				break;
 			case 0xe5:
-				move_queen(2, 0, 1);
+				move_queen(out, 2, 0, 1);
 				break;
 			case 0xe6:
-				move_rook(1, 0, 7);
+				move_rook(out, 1, 0, 7);
 				break;
 			case 0xe7:
-				move_queen(3, 1, 1);
+				move_queen(out, 3, 1, 1);
 				break;
 			case 0xe8:
-				move_queen(3, 6, 6);
+				move_queen(out, 3, 6, 6);
 				break;
 			case 0xe9:
-				move_knight(1, 6, 1);
+				move_knight(out, 1, 6, 1);
 				break;
 			case 0xea:
-				move_queen(2, 0, 5);
+				move_queen(out, 2, 0, 5);
 				break;
 			case 0xeb:
-				move_queen(1, 3, 0);
+				move_queen(out, 1, 3, 0);
 				break;
 			case 0xec:
-				move_knight(3, 1, 6);
+				move_knight(out, 3, 1, 6);
 				break;
 			case 0xed:
-				move_rook(3, 3, 0);
+				move_rook(out, 3, 3, 0);
 				break;
 			case 0xee:
-				move_rook(2, 0, 4);
+				move_rook(out, 2, 0, 4);
 				break;
 			case 0xef:
-				move_queen(2, 7, 0);
+				move_queen(out, 2, 7, 0);
 				break;
 			case 0xf0:
-				move_queen(3, 1, 0);
+				move_queen(out, 3, 1, 0);
 				break;
 			case 0xf1:
-				move_queen(3, 3, 5);
+				move_queen(out, 3, 3, 5);
 				break;
 			case 0xf2:
-				move_bishop(2, 2, 6);
+				move_bishop(out, 2, 2, 6);
 				break;
 			case 0xf3:
-				move_bishop(2, 6, 2);
+				move_bishop(out, 2, 6, 2);
 				break;
 			case 0xf4:
-				move_queen(3, 5, 0);
+				move_queen(out, 3, 5, 0);
 				break;
 			case 0xf5:
-				move_pawn(1, 7, 1);
+				move_pawn(out, 1, 7, 1);
 				break;
 			case 0xf6:
-				move_bishop(2, 1, 1);
+				move_bishop(out, 2, 1, 1);
 				break;
 			case 0xf8:
-				move_rook(1, 0, 2);
+				move_rook(out, 1, 0, 2);
 				break;
 			case 0xf9:
-				move_pawn(4, 7, 1);
+				move_pawn(out, 4, 7, 1);
 				break;
 			case 0xfa:
-				move_knight(1, 7, 2);
+				move_knight(out, 1, 7, 2);
 				break;
 			case 0xfb:
-				move_rook(2, 0, 5);
+				move_rook(out, 2, 0, 5);
 				break;
 			case 0xfc:
-				move_bishop(3, 6, 2);
+				move_bishop(out, 3, 6, 2);
 				break;
 			case 0xfe:
-				move_knight(2, 7, 2);
+				move_knight(out, 2, 7, 2);
 				break;
 			case 0xfd:
-				move_bishop(3, 7, 7);
+				move_bishop(out, 3, 7, 7);
 				break;
 			case 0xff:
-				move_pawn(5, 0, 2);
+				move_pawn(out, 5, 0, 2);
 				break;
 			default:
 				std::string code;
@@ -1865,6 +1854,15 @@ static short MoveNumberLookup[256] = {
 				code += digits[ch & 0xf];
 				fail("unknown code 0x" + code);
 		}
+		if (chrs + out.str().size() > 79) {
+			std::cout << "\n";
+			chrs = 0;
+		} else {
+			chrs += 1;
+			std::cout << ' ';
+		}
+		chrs += out.str().size();
+		std::cout << out.str();
 		brd.switch_players();
 	}
 } 
