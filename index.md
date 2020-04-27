@@ -57,6 +57,10 @@
 		(path + ".cbp").c_str(),
 		std::ifstream::binary
 	};
+	std::ifstream tournament_file {
+		(path + ".cbt").c_str(),
+		std::ifstream::binary
+	};
 	char main_entry[46];
 @end(main)
 ```
@@ -133,6 +137,31 @@
 
 ```
 @def(process game) {
+	std::cout << "[Event \"";
+	int nr { get_int(main_entry + 15, 3) };
+	if (! tournament_file.seekg(32 + 99 * nr, std::ifstream::beg)) {
+		fail("can't move to tournament " + to_str(nr));
+	}
+	char entry[99];
+	if (! tournament_file.read(entry, sizeof(entry))) {
+		fail("can't read tournament " + to_str(nr));
+	}
+	for (char *c { entry + 9 }; *c && c < entry + 49; ++c) {
+		std::cout << *c;
+	}
+	if (! entry[9]) { std::cout << '?'; }
+	std::cout << "\"]\n";
+	std::cout << "[Site \"";
+	for (char *c { entry + 49 }; *c && c < entry + 79; ++c) {
+		std::cout << *c;
+	}
+	if (! entry[49]) { std::cout << '?'; }
+	std::cout << "\"]\n";
+} @end(process game)
+```
+
+```
+@add(process game) {
 	int date { get_int(
 		main_entry + 24, 3
 	) };
@@ -158,8 +187,6 @@
 
 ```
 @def(print date)
-	std::cout << "[Event \"?\"]\n";
-	std::cout << "[Site \"?\"]\n";
 	std::cout << "[Date \"" << 
 		to_str_not_null(year, "????") <<
 		"." <<
@@ -499,7 +526,10 @@
 			return true;
 		}
 		bool check() { 
-			return cur_->any_attacks(*this, *other_->king.get());
+			if (other_->king) {
+				return cur_->any_attacks(*this, *other_->king.get());
+			}
+			return false;
 		}
 		void kingside_rochade();
 		void queenside_rochade();
@@ -1073,6 +1103,7 @@
 		int mf { 0 };
 		Piece *r { nullptr };
 		for (Piece *cur { cur_->rooks.get() }; cur; cur = cur->next()) {
+			if (cur->rank() != kp->rank()) { continue; }
 			int pf { cur->file() };
 			if (pf < kf && pf > mf) {
 				mf = pf;
@@ -1082,11 +1113,16 @@
 		if (! r) {
 			fail("no queenside rook found");
 		}
-		Position nr { *kp + Position { -1, 0 } };
-		Position nk { *kp + Position { -2, 0 } };
 		r->file(kf - 1);
 		kp->file(kf - 2);
 		std::cout << "O-O-O ";
+		/*	
+		std::cout << "{ " << (std::string) *kp << " ";
+		for (Piece *cur { cur_->rooks.get() }; cur; cur = cur->next()) {
+			std::cout << (std::string) *cur << ' ';
+		}
+		std::cout << "} ";
+		*/
 	}
 @end(globals)
 ```
@@ -1153,11 +1189,20 @@ static short MoveNumberLookup[256] = {
 			std::cout << (1 + (nr >> 1)) << ". ";
 		}
 		//std::cout << '[' << count << ", " << len << ", " << nr << "] ";
-		std::cout << '{' << std::hex << ch << std::dec << "} ";
+		//std::cout << '{' << std::hex << ch << std::dec << "} ";
 
 		switch (ch) {
+			case 0x00:
+				move_queen(2, 6, 6);
+				break;
+			case 0x01:
+				move_queen(2, 0, 7);
+				break;
 			case 0x02:
 				move_bishop(1, 1, 1);
+				break;
+			case 0x04:
+				move_queen(3, 2, 6);
 				break;
 			case 0x05:
 				move_rook(2, 2, 0);
@@ -1174,11 +1219,26 @@ static short MoveNumberLookup[256] = {
 			case 0x09:
 				move_pawn(6, 0, 1);
 				break;
+			case 0x0a:
+				move_rook(3, 0, 6);
+				break;
 			case 0x0b:
 				move_pawn(4, 0, 2);
 				break;
+			case 0x0d:
+				move_queen(3, 0, 4);
+				break;
 			case 0x0e:
 				move_knight(2, 1, 2);
+				break;
+			case 0x0f:
+				move_queen(3, 0, 3);
+				break;
+			case 0x10:
+				move_rook(3, 4, 0);
+				break;
+			case 0x11:
+				move_queen(2, 0, 4);
 				break;
 			case 0x12:
 				move_pawn(8, 0, 1);
@@ -1204,14 +1264,35 @@ static short MoveNumberLookup[256] = {
 			case 0x19:
 				move_pawn(8, 7, 1);
 				break;
+			case 0x1a:
+				move_queen(3, 0, 1);
+				break;
+			case 0x1b:
+				move_rook(3, 0, 4);
+				break;
+			case 0x1d:
+				move_queen(2, 5, 0);
+				break;
+			case 0x1f:
+				move_queen(2, 4, 4);
+				break;
+			case 0x20:
+				move_queen(2, 2, 6);
+				break;
 			case 0x21:
 				move_queen(1, 4, 0);
+				break;
+			case 0x23:
+				move_queen(3, 0, 7);
 				break;
 			case 0x24:
 				move_queen(1, 6, 6);
 				break;
 			case 0x26:
 				move_rook(1, 3, 0);
+				break;
+			case 0x27:
+				move_knight(3, 2, 7);
 				break;
 			case 0x28:
 				move_queen(1, 3, 5);
@@ -1231,6 +1312,11 @@ static short MoveNumberLookup[256] = {
 					fail("no to position " + to_str(to >> 3) + ", " + to_str(to % 8));
 				}
 				if (from_piece->pawn() && (top.rank() == 1 || top.rank() == 8)) {
+					if (top.file() != from_piece->file()) {
+						std::cout << from_piece->file_str() << 'x';
+						Piece *old = brd.get(top);
+						if (old) { brd.remove(old); }
+					}
 					from_piece->file(0);
 					from_piece->rank(0);
 					Piece *to_piece { nullptr };
@@ -1250,12 +1336,26 @@ static short MoveNumberLookup[256] = {
 						default:
 							fail("unknown promotion piece " + to_str(prom));
 					}
-					std::cout << (std::string) top << "=" << to_piece->name() << ' ';
+					std::cout << (std::string) top << "=" << to_piece->name();
+					if (brd.check()) {
+						if (brd.mate()) {
+							std::cout << '#';
+						} else {
+							std::cout << '+';
+						}
+					}
+					std::cout << " ";
 					break;
 				}
 				brd.move(brd.first(*from_piece), from_piece, top);
 				break;
 			}
+			case 0x2a:
+				move_queen(2, 4, 4);
+				break;
+			case 0x2b:
+				move_rook(3, 0, 7);
+				break;
 			case 0x2c:
 				move_bishop(1, 5, 3);
 				break;
@@ -1270,6 +1370,9 @@ static short MoveNumberLookup[256] = {
 				break;
 			case 0x30:
 				move_rook(1, 5, 0);
+				break;
+			case 0x31:
+				move_queen(2, 0, 6);
 				break;
 			case 0x32:
 				move_rook(2, 6, 0);
@@ -1289,23 +1392,47 @@ static short MoveNumberLookup[256] = {
 			case 0x37:
 				move_bishop(1, 7, 1);
 				break;
+			case 0x38:
+				move_queen(3, 3, 3);
+				break;
 			case 0x39:
 				move_king(1, 1);
 				break;
 			case 0x3a:
 				move_pawn(7, 7, 1);
 				break;
+			case 0x3b:
+				move_bishop(3, 4, 4);
+				break;
 			case 0x3d:
 				move_knight(1, 1, 2);
+				break;
+			case 0x3e:
+				move_bishop(3, 3, 5);
 				break;
 			case 0x3f:
 				move_bishop(2, 2, 2);
 				break;
+			case 0x40:
+				move_queen(3, 2, 2);
+				break;
 			case 0x41:
 				move_bishop(1, 4, 4);
 				break;
+			case 0x42:
+				move_queen(3, 0, 2);
+				break;
 			case 0x43:
 				move_rook(1, 0, 3);
+				break;
+			case 0x44:
+				move_queen(2, 1, 1);
+				break;
+			case 0x45:
+				move_bishop(3, 3, 3);
+				break;
+			case 0x46:
+				move_bishop(3, 4, 4);
 				break;
 			case 0x47:
 				move_king(-1, 1);
@@ -1319,11 +1446,23 @@ static short MoveNumberLookup[256] = {
 			case 0x4a:
 				move_knight(1, 2, 7);
 				break;
+			case 0x4b:
+				move_queen(2, 7, 7);
+				break;
 			case 0x4d:
 				move_queen(1, 1, 1);
 				break;
 			case 0x4e:
 				move_rook(1, 0, 1);
+				break;
+			case 0x4f:
+				move_queen(3, 4, 0);
+				break;
+			case 0x50:
+				move_queen(2, 0, 3);
+				break;
+			case 0x51:
+				move_bishop(3, 1, 1);
 				break;
 			case 0x52:
 				move_rook(2, 7, 0);
@@ -1331,8 +1470,14 @@ static short MoveNumberLookup[256] = {
 			case 0x53:
 				move_queen(1, 0, 4);
 				break;
+			case 0x54:
+				move_queen(3, 3, 0);
+				break;
 			case 0x55:
 				move_bishop(1, 3, 5);
+				break;
+			case 0x56:
+				move_bishop(3, 5, 5);
 				break;
 			case 0x57:
 				move_queen(1, 7, 0);
@@ -1340,8 +1485,17 @@ static short MoveNumberLookup[256] = {
 			case 0x58:
 				move_knight(1, 2, 1);
 				break;
+			case 0x59:
+				move_queen(3, 4, 4);
+				break;
 			case 0x5a:
 				move_queen(1, 6, 2);
+				break;
+			case 0x5b:
+				move_queen(2, 3, 5);
+				break;
+			case 0x5c:
+				move_queen(2, 1, 0);
 				break;
 			case 0x5d:
 				move_king(1, -1);
@@ -1351,6 +1505,9 @@ static short MoveNumberLookup[256] = {
 				break;
 			case 0x5f:
 				move_knight(2, 6, 1);
+				break;
+			case 0x60:
+				move_queen(2, 7, 1);
 				break;
 			case 0x61:
 				move_rook(1, 6, 0);
@@ -1364,11 +1521,26 @@ static short MoveNumberLookup[256] = {
 			case 0x64:
 				move_pawn(2, 0, 1);
 				break;
+			case 0x66:
+				move_bishop(3, 2, 6);
+				break;
+			case 0x67:
+				move_queen(2, 1, 7);
+				break;
 			case 0x68:
 				move_rook(2, 0, 3);
 				break;
+			case 0x69:
+				move_rook(3, 6, 0);
+				break;
+			case 0x6a:
+				move_queen(3, 6, 2);
+				break;
 			case 0x6b:
 				move_queen(1, 0, 6);
+				break;
+			case 0x6c:
+				move_queen(3, 7, 7);
 				break;
 			case 0x6d:
 				move_bishop(2, 3, 5);
@@ -1385,8 +1557,14 @@ static short MoveNumberLookup[256] = {
 			case 0x71:
 				move_bishop(2, 4, 4);
 				break;
+			case 0x72:
+				move_queen(3, 7, 0);
+				break;
 			case 0x73:
 				move_bishop(2, 5, 5);
+				break;
+			case 0x74:
+				move_rook(3, 5, 0);
 				break;
 			case 0x75:
 				move_knight(2, 6, 7);
@@ -1403,6 +1581,9 @@ static short MoveNumberLookup[256] = {
 			case 0x79:
 				move_queen(1, 1, 0);
 				break;
+			case 0x7a:
+				move_queen(3, 2, 0);
+				break;
 			case 0x7b:
 				move_pawn(3, 0, 1);
 				break;
@@ -1412,14 +1593,35 @@ static short MoveNumberLookup[256] = {
 			case 0x7d:
 				move_pawn(6, 1, 1);
 				break;
+			case 0x7e:
+				move_queen(2, 6, 0);
+				break;
 			case 0x7f:
 				move_queen(1, 0, 5);
+				break;
+			case 0x80:
+				move_queen(2, 2, 2);
+				break;
+			case 0x81:
+				move_rook(3, 0, 1);
+				break;
+			case 0x82:
+				move_rook(3, 0, 2);
+				break;
+			case 0x83:
+				move_queen(2, 5, 5);
 				break;
 			case 0x84:
 				move_pawn(5, 0, 1);
 				break;
 			case 0x85:
 				move_pawn(3, 7, 1);
+				break;
+			case 0x86:
+				move_queen(3, 1, 7);
+				break;
+			case 0x87:
+				move_queen(3, 5, 5);
 				break;
 			case 0x88:
 				move_rook(1, 4, 0);
@@ -1430,17 +1632,35 @@ static short MoveNumberLookup[256] = {
 			case 0x8b:
 				move_rook(2, 3, 0);
 				break;
+			case 0x8c:
+				move_queen(3, 4, 4);
+				break;
 			case 0x8d:
 				move_queen(1, 0, 7);
 				break;
 			case 0x8e:
 				move_pawn(1, 1, 1);
 				break;
+			case 0x8f:
+				move_rook(3, 1, 0);
+				break;
 			case 0x90:
 				move_pawn(4, 1, 1);
 				break;
+			case 0x91:
+				move_bishop(3, 6, 6);
+				break;
+			case 0x92:
+				move_queen(2, 5, 3);
+				break;
 			case 0x93:
 				move_bishop(2, 4, 4);
+				break;
+			case 0x94:
+				move_queen(2, 0, 2);
+				break;
+			case 0x95:
+				move_queen(2, 2, 0);
 				break;
 			case 0x96:
 				move_queen(1, 7, 7);
@@ -1454,14 +1674,29 @@ static short MoveNumberLookup[256] = {
 			case 0x99:
 				move_queen(1, 5, 0);
 				break;
+			case 0x9a:
+				move_rook(3, 0, 3);
+				break;
+			case 0x9b:
+				move_knight(3, 2, 1);
+				break;
 			case 0x9c:
 				move_rook(1, 0, 6);
+				break;
+			case 0x9d:
+				move_rook(3, 0, 5);
 				break;
 			case 0x9e:
 				move_pawn(6, 0, 2);
 				break;
+			case 0xa0:
+				move_queen(2, 3, 3);
+				break;
 			case 0xa1:
 				move_rook(2, 4, 0);
+				break;
+			case 0xa3:
+				move_knight(3, 6, 1);
 				break;
 			case 0xa2:
 				move_bishop(2, 5, 3);
@@ -1478,11 +1713,25 @@ static short MoveNumberLookup[256] = {
 			case 0xa7:
 				move_queen(1, 1, 7);
 				break;
+			case 0xa8:
+				move_queen(3, 6, 0);
+				break;
 			case 0xa9:
 				move_rook(2, 0, 2);
 				break;
+			case 0xaa:
+				break;
+			case 0xab:
+				move_bishop(3, 1, 7);
+				break;
+			case 0xac:
+				move_knight(3, 6, 7);
+				break;
 			case 0xae:
 				move_bishop(1, 6, 2);
+				break;
+			case 0xb0:
+				move_queen(3, 0, 5);
 				break;
 			case 0xb1:
 				move_king(-1, -1);
@@ -1490,11 +1739,17 @@ static short MoveNumberLookup[256] = {
 			case 0xb2:
 				move_king(-1, 0);
 				break;
+			case 0xb3:
+				move_bishop(3, 5, 3);
+				break;
 			case 0xb4:
 				move_queen(1, 2, 2);
 				break;
 			case 0xb5:
 				brd.queenside_rochade();
+				break;
+			case 0xb6:
+				move_queen(2, 6, 2);
 				break;
 			case 0xb7:
 				move_bishop(1, 2, 6);
@@ -1502,8 +1757,8 @@ static short MoveNumberLookup[256] = {
 			case 0xb8:
 				move_queen(1, 0, 2);
 				break;
-			case 0xd9:
-				move_bishop(1, 4, 4);
+			case 0xb9:
+				move_bishop(3, 2, 2);
 				break;
 			case 0xba:
 				move_knight(1, 6, 7);
@@ -1523,6 +1778,9 @@ static short MoveNumberLookup[256] = {
 			case 0xbf:
 				move_queen(1, 3, 3);
 				break;
+			case 0xc0:
+				move_knight(3, 1, 2);
+				break;
 			case 0xc1:
 				move_pawn(1, 0, 2);
 				break;
@@ -1541,20 +1799,50 @@ static short MoveNumberLookup[256] = {
 			case 0xc6:
 				move_rook(1, 2, 0);
 				break;
+			case 0xc8:
+				move_bishop(3, 7, 1);
+				break;
+			case 0xc9:
+				move_knight(3, 7, 6);
+				break;
+			case 0xca:
+				move_queen(2, 3, 0);
+				break;
 			case 0xcb:
 				move_queen(1, 0, 3);
+				break;
+			case 0xcd:
+				move_rook(3, 2, 0);
+				break;
+			case 0xce:
+				move_queen(3, 5, 3);
+				break;
+			case 0xd1:
+				move_queen(3, 0, 6);
 				break;
 			case 0xd2:
 				move_queen(1, 6, 0);
 				break;
+			case 0xd3:
+				move_queen(2, 4, 0);
+				break;
 			case 0xd4:
 				move_knight(1, 7, 6);
+				break;
+			case 0xd6:
+				move_rook(3, 7, 0);
 				break;
 			case 0xd7:
 				move_rook(1, 0, 4);
 				break;
 			case 0xd8:
 				move_king(1, 0);
+				break;
+			case 0xd9:
+				move_bishop(1, 4, 4);
+				break;
+			case 0xdb:
+				move_queen(3, 7, 1);
 				break;
 			case 0xde:
 				move_pawn(6, 7, 1);
@@ -1577,26 +1865,59 @@ static short MoveNumberLookup[256] = {
 			case 0xe2:
 				move_rook(2, 0, 7);
 				break;
+			case 0xe3:
+				move_knight(3, 7, 2);
+				break;
 			case 0xe4:
 				move_bishop(1, 7, 7);
+				break;
+			case 0xe5:
+				move_queen(2, 0, 1);
 				break;
 			case 0xe6:
 				move_rook(1, 0, 7);
 				break;
+			case 0xe7:
+				move_queen(3, 1, 1);
+				break;
+			case 0xe8:
+				move_queen(3, 6, 6);
+				break;
 			case 0xe9:
 				move_knight(1, 6, 1);
+				break;
+			case 0xea:
+				move_queen(2, 0, 5);
 				break;
 			case 0xeb:
 				move_queen(1, 3, 0);
 				break;
+			case 0xec:
+				move_knight(3, 1, 6);
+				break;
+			case 0xed:
+				move_rook(3, 3, 0);
+				break;
 			case 0xee:
 				move_rook(2, 0, 4);
+				break;
+			case 0xef:
+				move_queen(2, 7, 0);
+				break;
+			case 0xf0:
+				move_queen(3, 1, 0);
+				break;
+			case 0xf1:
+				move_queen(3, 3, 5);
 				break;
 			case 0xf2:
 				move_bishop(2, 2, 6);
 				break;
 			case 0xf3:
 				move_bishop(2, 6, 2);
+				break;
+			case 0xf4:
+				move_queen(3, 5, 0);
 				break;
 			case 0xf5:
 				move_pawn(1, 7, 1);
@@ -1616,8 +1937,14 @@ static short MoveNumberLookup[256] = {
 			case 0xfb:
 				move_rook(2, 0, 5);
 				break;
+			case 0xfc:
+				move_bishop(3, 6, 2);
+				break;
 			case 0xfe:
 				move_knight(2, 7, 2);
+				break;
+			case 0xfd:
+				move_bishop(3, 7, 7);
 				break;
 			case 0xff:
 				move_pawn(5, 0, 2);

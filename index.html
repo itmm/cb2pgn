@@ -75,6 +75,10 @@
 <span class="in2"></span>(<span class="var">path</span> + <span class="str">".cbp"</span>).<span class="fn">c_str</span>(),<br/>
 <span class="in2"></span><span class="type">std</span>::<span class="type">ifstream</span>::<span class="var">binary</span><br/>
 <span class="in1"></span>};<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="type">ifstream</span> <span class="var">tournament_file</span> {<br/>
+<span class="in2"></span>(<span class="var">path</span> + <span class="str">".cbt"</span>).<span class="fn">c_str</span>(),<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="type">ifstream</span>::<span class="var">binary</span><br/>
+<span class="in1"></span>};<br/>
 <span class="in1"></span><span class="type">char</span> <span class="var">main_entry</span>[<span class="num">46</span>];<br/>
 <span class="macro">@end(<span class="name">main</span>)</span><br/>
 </code></div>
@@ -158,6 +162,32 @@
 <div class="page"><div class="slide"><div class="slide-nr">14</div>
 <code>
 <span class="macro">@def(<span class="name">process game</span>)</span> {<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Event \""</span>;<br/>
+<span class="in1"></span><span class="type">int</span> <span class="var">nr</span> { <span class="fn">get_int</span>(<span class="var">main_entry</span> + <span class="num">15</span>, <span class="num">3</span>) };<br/>
+<span class="in1"></span><span class="keyword">if</span> (! <span class="var">tournament_file</span>.<span class="fn">seekg</span>(<span class="num">32</span> + <span class="num">99</span> * <span class="var">nr</span>, <span class="type">std</span>::<span class="type">ifstream</span>::<span class="var">beg</span>)) {<br/>
+<span class="in2"></span><span class="fn">fail</span>(<span class="str">"can't move to tournament "</span> + <span class="fn">to_str</span>(<span class="var">nr</span>));<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">char</span> <span class="var">entry</span>[<span class="num">99</span>];<br/>
+<span class="in1"></span><span class="keyword">if</span> (! <span class="var">tournament_file</span>.<span class="fn">read</span>(<span class="var">entry</span>, <span class="fn">sizeof</span>(<span class="var">entry</span>))) {<br/>
+<span class="in2"></span><span class="fn">fail</span>(<span class="str">"can't read tournament "</span> + <span class="fn">to_str</span>(<span class="var">nr</span>));<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="keyword">for</span> (<span class="type">char</span> *<span class="var">c</span> { <span class="var">entry</span> + <span class="num">9</span> }; *<span class="var">c</span> &amp;&amp; <span class="var">c</span> &lt; <span class="var">entry</span> + <span class="num">49</span>; ++<span class="var">c</span>) {<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; *<span class="var">c</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="keyword">if</span> (! <span class="var">entry</span>[<span class="num">9</span>]) { <span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'?'</span>; }<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"\"]\n"</span>;<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Site \""</span>;<br/>
+<span class="in1"></span><span class="keyword">for</span> (<span class="type">char</span> *<span class="var">c</span> { <span class="var">entry</span> + <span class="num">49</span> }; *<span class="var">c</span> &amp;&amp; <span class="var">c</span> &lt; <span class="var">entry</span> + <span class="num">79</span>; ++<span class="var">c</span>) {<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; *<span class="var">c</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="keyword">if</span> (! <span class="var">entry</span>[<span class="num">49</span>]) { <span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'?'</span>; }<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"\"]\n"</span>;<br/>
+} <span class="macro">@end(<span class="name">process game</span>)</span><br/>
+</code></div>
+</div>
+<div class="page"><div class="slide"><div class="slide-nr">15</div>
+<code>
+<span class="macro">@add(<span class="name">process game</span>)</span> {<br/>
 <span class="in1"></span><span class="type">int</span> <span class="var">date</span> { <span class="fn">get_int</span>(<br/>
 <span class="in2"></span><span class="var">main_entry</span> + <span class="num">24</span>, <span class="num">3</span><br/>
 <span class="in1"></span>) };<br/>
@@ -168,7 +198,7 @@
 } <span class="macro">@end(<span class="name">process game</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">15</div>
+<div class="page"><div class="slide"><div class="slide-nr">16</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">std</span>::<span class="type">string</span> <span class="fn">to_str_not_null</span>(<br/>
@@ -182,11 +212,9 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">16</div>
+<div class="page"><div class="slide"><div class="slide-nr">17</div>
 <code>
 <span class="macro">@def(<span class="name">print date</span>)</span><br/>
-<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Event \"?\"]\n"</span>;<br/>
-<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Site \"?\"]\n"</span>;<br/>
 <span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[Date \""</span> &lt;&lt; <br/>
 <span class="in2"></span><span class="fn">to_str_not_null</span>(<span class="var">year</span>, <span class="str">"????"</span>) &lt;&lt;<br/>
 <span class="in2"></span><span class="str">"."</span> &lt;&lt;<br/>
@@ -197,7 +225,7 @@
 <span class="macro">@end(<span class="name">print date</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">17</div>
+<div class="page"><div class="slide"><div class="slide-nr">18</div>
 <code>
 <span class="macro">@add(<span class="name">process game</span>)</span> {<br/>
 <span class="in1"></span><span class="type">int</span> <span class="var">round</span> { <span class="var">main_entry</span>[<span class="num">29</span>] };<br/>
@@ -206,7 +234,7 @@
 } <span class="macro">@end(<span class="name">process game</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">18</div>
+<div class="page"><div class="slide"><div class="slide-nr">19</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">print_player</span>(<span class="type">std</span>::<span class="type">ifstream</span> &amp;<span class="keyword">in</span>, <span class="type">int</span> <span class="var">nr</span>) {<br/>
@@ -230,7 +258,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">19</div>
+<div class="page"><div class="slide"><div class="slide-nr">20</div>
 <code>
 <span class="macro">@add(<span class="name">process game</span>)</span> {<br/>
 <span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[White \""</span>;<br/>
@@ -242,7 +270,7 @@
 } <span class="macro">@end(<span class="name">process game</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">20</div>
+<div class="page"><div class="slide"><div class="slide-nr">21</div>
 <code>
 <span class="macro">@add(<span class="name">process game</span>)</span><br/>
 <span class="in1"></span><span class="type">std</span>::<span class="type">string</span> <span class="var">result</span>;<br/>
@@ -261,7 +289,7 @@
 <span class="macro">@end(<span class="name">process game</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">21</div>
+<div class="page"><div class="slide"><div class="slide-nr">22</div>
 <code>
 <span class="macro">@add(<span class="name">process game</span>)</span><br/>
 <span class="in1"></span><span class="macro">@put(<span class="name">process moves</span>)</span>;<br/>
@@ -269,7 +297,7 @@
 <span class="macro">@end(<span class="name">process game</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">22</div>
+<div class="page"><div class="slide"><div class="slide-nr">23</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">int</span> <span class="fn">get_int</span>(<br/>
@@ -285,7 +313,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">23</div>
+<div class="page"><div class="slide"><div class="slide-nr">24</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="keyword">#include</span> &lt;<span class="var">memory</span>&gt;<br/>
@@ -533,7 +561,10 @@
 <span class="in3"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
 <span class="in2"></span>}<br/>
 <span class="in2"></span><span class="type">bool</span> <span class="fn">check</span>() { <br/>
-<span class="in3"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">any_attacks</span>(*<span class="var">this</span>, *<span class="var">other_</span>-&gt;<span class="var">king</span>.<span class="fn">get</span>());<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">other_</span>-&gt;<span class="var">king</span>) {<br/>
+<span class="in4"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">any_attacks</span>(*<span class="var">this</span>, *<span class="var">other_</span>-&gt;<span class="var">king</span>.<span class="fn">get</span>());<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="num">false</span>;<br/>
 <span class="in2"></span>}<br/>
 <span class="in2"></span><span class="type">void</span> <span class="fn">kingside_rochade</span>();<br/>
 <span class="in2"></span><span class="type">void</span> <span class="fn">queenside_rochade</span>();<br/>
@@ -856,14 +887,14 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">24</div>
+<div class="page"><div class="slide"><div class="slide-nr">25</div>
 <code>
 <span class="macro">@def(<span class="name">unit-tests</span>)</span> <br/>
 <span class="in1"></span><span class="type">Board</span> <span class="var">brd</span>;<br/>
 <span class="macro">@end(<span class="name">unit-tests</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">25</div>
+<div class="page"><div class="slide"><div class="slide-nr">26</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">test_1_fig</span>(<br/>
@@ -894,7 +925,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">26</div>
+<div class="page"><div class="slide"><div class="slide-nr">27</div>
 <code>
 <span class="macro">@add(<span class="name">unit-tests</span>)</span><br/>
 <span class="in1"></span><span class="fn">test_1_fig</span>(&amp;<span class="type">Board</span>::<span class="var">king</span>, <span class="num">false</span>, <span class="str">"e1"</span>);<br/>
@@ -904,7 +935,7 @@
 <span class="macro">@end(<span class="name">unit-tests</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">27</div>
+<div class="page"><div class="slide"><div class="slide-nr">28</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">test_2_fig</span>(<br/>
@@ -922,7 +953,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span>;<br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">28</div>
+<div class="page"><div class="slide"><div class="slide-nr">29</div>
 <code>
 <span class="macro">@add(<span class="name">unit-tests</span>)</span><br/>
 <span class="in1"></span><span class="fn">test_2_fig</span>(&amp;<span class="type">Board</span>::<span class="var">rook</span>, <span class="num">false</span>, <span class="str">"a1"</span>, <span class="str">"h1"</span>);<br/>
@@ -934,7 +965,7 @@
 <span class="macro">@end(<span class="name">unit-tests</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">29</div>
+<div class="page"><div class="slide"><div class="slide-nr">30</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">test_8_fig</span>(<br/>
@@ -964,7 +995,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">30</div>
+<div class="page"><div class="slide"><div class="slide-nr">31</div>
 <code>
 <span class="macro">@add(<span class="name">unit-tests</span>)</span><br/>
 <span class="in1"></span><span class="fn">test_8_fig</span>(&amp;<span class="type">Board</span>::<span class="var">pawn</span>, <span class="num">false</span>, <span class="str">"a2"</span>, <span class="str">"b2"</span>, <span class="str">"c2"</span>, <span class="str">"d2"</span>, <span class="str">"e2"</span>, <span class="str">"f2"</span>, <span class="str">"g2"</span>, <span class="str">"h2"</span>);<br/>
@@ -972,7 +1003,7 @@
 <span class="macro">@end(<span class="name">unit-tests</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">31</div>
+<div class="page"><div class="slide"><div class="slide-nr">32</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">test_add</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">p</span>, <span class="type">int</span> <span class="var">f</span>, <span class="type">int</span> <span class="var">r</span>, <span class="type">const</span> <span class="type">std</span>::<span class="type">string</span> &amp;<span class="var">exp</span>) {<br/>
@@ -985,7 +1016,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">32</div>
+<div class="page"><div class="slide"><div class="slide-nr">33</div>
 <code>
 <span class="macro">@add(<span class="name">unit-tests</span>)</span> {<br/>
 <span class="in1"></span><span class="type">const</span> <span class="type">auto</span> &amp;<span class="var">wk</span> { *<span class="var">brd</span>.<span class="fn">king</span>() };<br/>
@@ -995,7 +1026,7 @@
 } <span class="macro">@end(<span class="name">unit-tests</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">33</div>
+<div class="page"><div class="slide"><div class="slide-nr">34</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">bool</span> <span class="fn">move_piece</span>(<span class="type">Piece</span> *(<span class="type">Board</span>::*<span class="var">fn</span>)(<span class="type">int</span>, <span class="type">bool</span>) <span class="type">const</span>, <span class="type">int</span> <span class="var">nr</span>, <span class="type">int</span> <span class="var">f</span>, <span class="type">int</span> <span class="var">r</span>) {<br/>
@@ -1013,7 +1044,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">34</div>
+<div class="page"><div class="slide"><div class="slide-nr">35</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">move_king</span>(<span class="type">int</span> <span class="var">f</span>, <span class="type">int</span> <span class="var">r</span>) {<br/>
@@ -1024,7 +1055,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">35</div>
+<div class="page"><div class="slide"><div class="slide-nr">36</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">move_queen</span>(<span class="type">int</span> <span class="var">nr</span>, <span class="type">int</span> <span class="var">f</span>, <span class="type">int</span> <span class="var">r</span>) {<br/>
@@ -1035,7 +1066,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">36</div>
+<div class="page"><div class="slide"><div class="slide-nr">37</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">move_rook</span>(<span class="type">int</span> <span class="var">nr</span>, <span class="type">int</span> <span class="var">f</span>, <span class="type">int</span> <span class="var">r</span>) {<br/>
@@ -1046,7 +1077,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">37</div>
+<div class="page"><div class="slide"><div class="slide-nr">38</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">move_bishop</span>(<span class="type">int</span> <span class="var">nr</span>, <span class="type">int</span> <span class="var">f</span>, <span class="type">int</span> <span class="var">r</span>) {<br/>
@@ -1057,7 +1088,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">38</div>
+<div class="page"><div class="slide"><div class="slide-nr">39</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">move_knight</span>(<span class="type">int</span> <span class="var">nr</span>, <span class="type">int</span> <span class="var">f</span>, <span class="type">int</span> <span class="var">r</span>) {<br/>
@@ -1068,7 +1099,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">39</div>
+<div class="page"><div class="slide"><div class="slide-nr">40</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="fn">move_pawn</span>(<span class="type">int</span> <span class="var">nr</span>, <span class="type">int</span> <span class="var">f</span>, <span class="type">int</span> <span class="var">r</span>) {<br/>
@@ -1083,7 +1114,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">40</div>
+<div class="page"><div class="slide"><div class="slide-nr">41</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="type">Board</span>::<span class="fn">kingside_rochade</span>() {<br/>
@@ -1116,7 +1147,7 @@
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">41</div>
+<div class="page"><div class="slide"><div class="slide-nr">42</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
 <span class="in1"></span><span class="type">void</span> <span class="type">Board</span>::<span class="fn">queenside_rochade</span>() {<br/>
@@ -1125,6 +1156,7 @@
 <span class="in2"></span><span class="type">int</span> <span class="var">mf</span> { <span class="num">0</span> };<br/>
 <span class="in2"></span><span class="type">Piece</span> *<span class="var">r</span> { <span class="num">nullptr</span> };<br/>
 <span class="in2"></span><span class="keyword">for</span> (<span class="type">Piece</span> *<span class="var">cur</span> { <span class="var">cur_</span>-&gt;<span class="var">rooks</span>.<span class="fn">get</span>() }; <span class="var">cur</span>; <span class="var">cur</span> = <span class="var">cur</span>-&gt;<span class="fn">next</span>()) {<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">cur</span>-&gt;<span class="fn">rank</span>() != <span class="var">kp</span>-&gt;<span class="fn">rank</span>()) { <span class="keyword">continue</span>; }<br/>
 <span class="in3"></span><span class="type">int</span> <span class="var">pf</span> { <span class="var">cur</span>-&gt;<span class="fn">file</span>() };<br/>
 <span class="in3"></span><span class="keyword">if</span> (<span class="var">pf</span> &lt; <span class="var">kf</span> &amp;&amp; <span class="var">pf</span> &gt; <span class="var">mf</span>) {<br/>
 <span class="in4"></span><span class="var">mf</span> = <span class="var">pf</span>;<br/>
@@ -1134,16 +1166,21 @@
 <span class="in2"></span><span class="keyword">if</span> (! <span class="var">r</span>) {<br/>
 <span class="in3"></span><span class="fn">fail</span>(<span class="str">"no queenside rook found"</span>);<br/>
 <span class="in2"></span>}<br/>
-<span class="in2"></span><span class="type">Position</span> <span class="var">nr</span> { *<span class="var">kp</span> + <span class="type">Position</span> { -<span class="num">1</span>, <span class="num">0</span> } };<br/>
-<span class="in2"></span><span class="type">Position</span> <span class="var">nk</span> { *<span class="var">kp</span> + <span class="type">Position</span> { -<span class="num">2</span>, <span class="num">0</span> } };<br/>
 <span class="in2"></span><span class="var">r</span>-&gt;<span class="fn">file</span>(<span class="var">kf</span> - <span class="num">1</span>);<br/>
 <span class="in2"></span><span class="var">kp</span>-&gt;<span class="fn">file</span>(<span class="var">kf</span> - <span class="num">2</span>);<br/>
 <span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"O-O-O "</span>;<br/>
+<span class="in2"></span>/*	<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"{ "</span> &lt;&lt; (<span class="type">std</span>::<span class="type">string</span>) *<span class="var">kp</span> &lt;&lt; <span class="str">" "</span>;<br/>
+<span class="in2"></span><span class="keyword">for</span> (<span class="type">Piece</span> *<span class="var">cur</span> { <span class="var">cur_</span>-&gt;<span class="var">rooks</span>.<span class="fn">get</span>() }; <span class="var">cur</span>; <span class="var">cur</span> = <span class="var">cur</span>-&gt;<span class="fn">next</span>()) {<br/>
+<span class="in3"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; (<span class="type">std</span>::<span class="type">string</span>) *<span class="var">cur</span> &lt;&lt; <span class="str">' '</span>;<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"} "</span>;<br/>
+<span class="in2"></span>*/<br/>
 <span class="in1"></span>}<br/>
 <span class="macro">@end(<span class="name">globals</span>)</span><br/>
 </code></div>
 </div>
-<div class="page"><div class="slide"><div class="slide-nr">42</div>
+<div class="page"><div class="slide"><div class="slide-nr">43</div>
 <code>
 <span class="macro">@def(<span class="name">process moves</span>)</span> {<br/>
 <span class="in1"></span><span class="var">brd</span>.~<span class="fn">Board</span>();<br/>
@@ -1206,11 +1243,20 @@
 <span class="in3"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; (<span class="num">1</span> + (<span class="var">nr</span> &gt;&gt; <span class="num">1</span>)) &lt;&lt; <span class="str">". "</span>;<br/>
 <span class="in2"></span>}<br/>
 <span class="in2"></span>//<span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'['</span> &lt;&lt; <span class="var">count</span> &lt;&lt; <span class="str">", "</span> &lt;&lt; <span class="var">len</span> &lt;&lt; <span class="str">", "</span> &lt;&lt; <span class="var">nr</span> &lt;&lt; <span class="str">"] "</span>;<br/>
-<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'{'</span> &lt;&lt; <span class="type">std</span>::<span class="var">hex</span> &lt;&lt; <span class="var">ch</span> &lt;&lt; <span class="type">std</span>::<span class="var">dec</span> &lt;&lt; <span class="str">"} "</span>;<br/>
+<span class="in2"></span>//<span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'{'</span> &lt;&lt; <span class="type">std</span>::<span class="var">hex</span> &lt;&lt; <span class="var">ch</span> &lt;&lt; <span class="type">std</span>::<span class="var">dec</span> &lt;&lt; <span class="str">"} "</span>;<br/>
 <br/>
 <span class="in2"></span><span class="keyword">switch</span> (<span class="var">ch</span>) {<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x00</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">6</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x01</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x02</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">1</span>, <span class="num">1</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x04</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">2</span>, <span class="num">6</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x05</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">2</span>, <span class="num">2</span>, <span class="num">0</span>);<br/>
@@ -1227,11 +1273,26 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x09</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">6</span>, <span class="num">0</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x0a</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x0b</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">4</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x0d</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">4</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x0e</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">2</span>, <span class="num">1</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x0f</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x10</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">4</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x11</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">4</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x12</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">8</span>, <span class="num">0</span>, <span class="num">1</span>);<br/>
@@ -1257,14 +1318,35 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x19</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">8</span>, <span class="num">7</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x1a</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x1b</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">4</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x1d</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">5</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x1f</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x20</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">2</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x21</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">4</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x23</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">7</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x24</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">6</span>, <span class="num">6</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x26</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">1</span>, <span class="num">3</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x27</span>:<br/>
+<span class="in4"></span><span class="fn">move_knight</span>(<span class="num">3</span>, <span class="num">2</span>, <span class="num">7</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x28</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">3</span>, <span class="num">5</span>);<br/>
@@ -1284,6 +1366,11 @@
 <span class="in5"></span><span class="fn">fail</span>(<span class="str">"no to position "</span> + <span class="fn">to_str</span>(<span class="var">to</span> &gt;&gt; <span class="num">3</span>) + <span class="str">", "</span> + <span class="fn">to_str</span>(<span class="var">to</span> % <span class="num">8</span>));<br/>
 <span class="in4"></span>}<br/>
 <span class="in4"></span><span class="keyword">if</span> (<span class="var">from_piece</span>-&gt;<span class="fn">pawn</span>() &amp;&amp; (<span class="var">top</span>.<span class="fn">rank</span>() == <span class="num">1</span> || <span class="var">top</span>.<span class="fn">rank</span>() == <span class="num">8</span>)) {<br/>
+<span class="in5"></span><span class="keyword">if</span> (<span class="var">top</span>.<span class="fn">file</span>() != <span class="var">from_piece</span>-&gt;<span class="fn">file</span>()) {<br/>
+<span class="in6"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="var">from_piece</span>-&gt;<span class="fn">file_str</span>() &lt;&lt; <span class="str">'x'</span>;<br/>
+<span class="in6"></span><span class="type">Piece</span> *<span class="var">old</span> = <span class="var">brd</span>.<span class="fn">get</span>(<span class="var">top</span>);<br/>
+<span class="in6"></span><span class="keyword">if</span> (<span class="var">old</span>) { <span class="var">brd</span>.<span class="fn">remove</span>(<span class="var">old</span>); }<br/>
+<span class="in5"></span>}<br/>
 <span class="in5"></span><span class="var">from_piece</span>-&gt;<span class="fn">file</span>(<span class="num">0</span>);<br/>
 <span class="in5"></span><span class="var">from_piece</span>-&gt;<span class="fn">rank</span>(<span class="num">0</span>);<br/>
 <span class="in5"></span><span class="type">Piece</span> *<span class="var">to_piece</span> { <span class="num">nullptr</span> };<br/>
@@ -1303,12 +1390,26 @@
 <span class="in6"></span><span class="keyword">default</span>:<br/>
 <span class="in7"></span><span class="fn">fail</span>(<span class="str">"unknown promotion piece "</span> + <span class="fn">to_str</span>(<span class="var">prom</span>));<br/>
 <span class="in5"></span>}<br/>
-<span class="in5"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; (<span class="type">std</span>::<span class="type">string</span>) <span class="var">top</span> &lt;&lt; <span class="str">"="</span> &lt;&lt; <span class="var">to_piece</span>-&gt;<span class="fn">name</span>() &lt;&lt; <span class="str">' '</span>;<br/>
+<span class="in5"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; (<span class="type">std</span>::<span class="type">string</span>) <span class="var">top</span> &lt;&lt; <span class="str">"="</span> &lt;&lt; <span class="var">to_piece</span>-&gt;<span class="fn">name</span>();<br/>
+<span class="in5"></span><span class="keyword">if</span> (<span class="var">brd</span>.<span class="fn">check</span>()) {<br/>
+<span class="in6"></span><span class="keyword">if</span> (<span class="var">brd</span>.<span class="fn">mate</span>()) {<br/>
+<span class="in7"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'#'</span>;<br/>
+<span class="in6"></span>} <span class="keyword">else</span> {<br/>
+<span class="in7"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'+'</span>;<br/>
+<span class="in6"></span>}<br/>
+<span class="in5"></span>}<br/>
+<span class="in5"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">" "</span>;<br/>
 <span class="in5"></span><span class="keyword">break</span>;<br/>
 <span class="in4"></span>}<br/>
 <span class="in4"></span><span class="var">brd</span>.<span class="fn">move</span>(<span class="var">brd</span>.<span class="fn">first</span>(*<span class="var">from_piece</span>), <span class="var">from_piece</span>, <span class="var">top</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x2a</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x2b</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x2c</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">1</span>, <span class="num">5</span>, <span class="num">3</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
@@ -1323,6 +1424,9 @@
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x30</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">1</span>, <span class="num">5</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x31</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">6</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x32</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">2</span>, <span class="num">6</span>, <span class="num">0</span>);<br/>
@@ -1342,23 +1446,47 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x37</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">1</span>, <span class="num">7</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x38</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">3</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x39</span>:<br/>
 <span class="in4"></span><span class="fn">move_king</span>(<span class="num">1</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x3a</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">7</span>, <span class="num">7</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x3b</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x3d</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">1</span>, <span class="num">1</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x3e</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">3</span>, <span class="num">5</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x3f</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">2</span>, <span class="num">2</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x40</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">2</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x41</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">1</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x42</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x43</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x44</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">1</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x45</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">3</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x46</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x47</span>:<br/>
 <span class="in4"></span><span class="fn">move_king</span>(-<span class="num">1</span>, <span class="num">1</span>);<br/>
@@ -1372,11 +1500,23 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x4a</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">7</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x4b</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">7</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x4d</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">1</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x4e</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x4f</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">4</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x50</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x51</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">1</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x52</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">2</span>, <span class="num">7</span>, <span class="num">0</span>);<br/>
@@ -1384,8 +1524,14 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x53</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">4</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x54</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">3</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x55</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">1</span>, <span class="num">3</span>, <span class="num">5</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x56</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">5</span>, <span class="num">5</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x57</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">7</span>, <span class="num">0</span>);<br/>
@@ -1393,8 +1539,17 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x58</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x59</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x5a</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">6</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x5b</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">3</span>, <span class="num">5</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x5c</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">1</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x5d</span>:<br/>
 <span class="in4"></span><span class="fn">move_king</span>(<span class="num">1</span>, -<span class="num">1</span>);<br/>
@@ -1404,6 +1559,9 @@
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x5f</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">2</span>, <span class="num">6</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x60</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">7</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x61</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">1</span>, <span class="num">6</span>, <span class="num">0</span>);<br/>
@@ -1417,11 +1575,26 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x64</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x66</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">2</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x67</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">1</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x68</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">3</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x69</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">6</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x6a</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">6</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x6b</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x6c</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">7</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x6d</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">2</span>, <span class="num">3</span>, <span class="num">5</span>);<br/>
@@ -1438,8 +1611,14 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x71</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">2</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x72</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x73</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">2</span>, <span class="num">5</span>, <span class="num">5</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x74</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">5</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x75</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">2</span>, <span class="num">6</span>, <span class="num">7</span>);<br/>
@@ -1456,6 +1635,9 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x79</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">1</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x7a</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">2</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x7b</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
@@ -1465,14 +1647,35 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x7d</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">6</span>, <span class="num">1</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x7e</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">6</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x7f</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">5</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x80</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">2</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x81</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x82</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x83</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">5</span>, <span class="num">5</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x84</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">5</span>, <span class="num">0</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x85</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x86</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">1</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x87</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">5</span>, <span class="num">5</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x88</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">1</span>, <span class="num">4</span>, <span class="num">0</span>);<br/>
@@ -1483,17 +1686,35 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x8b</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">2</span>, <span class="num">3</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x8c</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x8d</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">7</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x8e</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">1</span>, <span class="num">1</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x8f</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">1</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x90</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">4</span>, <span class="num">1</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x91</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">6</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x92</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">5</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x93</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">2</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x94</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x95</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">2</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x96</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">7</span>, <span class="num">7</span>);<br/>
@@ -1507,14 +1728,29 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x99</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">5</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x9a</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x9b</span>:<br/>
+<span class="in4"></span><span class="fn">move_knight</span>(<span class="num">3</span>, <span class="num">2</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x9c</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x9d</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">5</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x9e</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">6</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xa0</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">3</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xa1</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">2</span>, <span class="num">4</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xa3</span>:<br/>
+<span class="in4"></span><span class="fn">move_knight</span>(<span class="num">3</span>, <span class="num">6</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xa2</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">2</span>, <span class="num">5</span>, <span class="num">3</span>);<br/>
@@ -1531,11 +1767,25 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xa7</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">1</span>, <span class="num">7</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xa8</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">6</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xa9</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xaa</span>:<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xab</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">1</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xac</span>:<br/>
+<span class="in4"></span><span class="fn">move_knight</span>(<span class="num">3</span>, <span class="num">6</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xae</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">1</span>, <span class="num">6</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xb0</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">5</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xb1</span>:<br/>
 <span class="in4"></span><span class="fn">move_king</span>(-<span class="num">1</span>, -<span class="num">1</span>);<br/>
@@ -1543,11 +1793,17 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xb2</span>:<br/>
 <span class="in4"></span><span class="fn">move_king</span>(-<span class="num">1</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xb3</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">5</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xb4</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xb5</span>:<br/>
 <span class="in4"></span><span class="var">brd</span>.<span class="fn">queenside_rochade</span>();<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xb6</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">6</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xb7</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">6</span>);<br/>
@@ -1555,8 +1811,8 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xb8</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
-<span class="in3"></span><span class="keyword">case</span> <span class="num">0xd9</span>:<br/>
-<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">1</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xb9</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">2</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xba</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">1</span>, <span class="num">6</span>, <span class="num">7</span>);<br/>
@@ -1576,6 +1832,9 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xbf</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">3</span>, <span class="num">3</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xc0</span>:<br/>
+<span class="in4"></span><span class="fn">move_knight</span>(<span class="num">3</span>, <span class="num">1</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xc1</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
@@ -1594,20 +1853,50 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xc6</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xc8</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xc9</span>:<br/>
+<span class="in4"></span><span class="fn">move_knight</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xca</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">3</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xcb</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xcd</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">2</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xce</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">5</span>, <span class="num">3</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xd1</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">0</span>, <span class="num">6</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xd2</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">6</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xd3</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">4</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xd4</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">1</span>, <span class="num">7</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xd6</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xd7</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">4</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xd8</span>:<br/>
 <span class="in4"></span><span class="fn">move_king</span>(<span class="num">1</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xd9</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">1</span>, <span class="num">4</span>, <span class="num">4</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xdb</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xde</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">6</span>, <span class="num">7</span>, <span class="num">1</span>);<br/>
@@ -1630,26 +1919,59 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xe2</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">7</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xe3</span>:<br/>
+<span class="in4"></span><span class="fn">move_knight</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xe4</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">1</span>, <span class="num">7</span>, <span class="num">7</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xe5</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">1</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xe6</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">1</span>, <span class="num">0</span>, <span class="num">7</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xe7</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">1</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xe8</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">6</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xe9</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">1</span>, <span class="num">6</span>, <span class="num">1</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xea</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">5</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xeb</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="num">1</span>, <span class="num">3</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xec</span>:<br/>
+<span class="in4"></span><span class="fn">move_knight</span>(<span class="num">3</span>, <span class="num">1</span>, <span class="num">6</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xed</span>:<br/>
+<span class="in4"></span><span class="fn">move_rook</span>(<span class="num">3</span>, <span class="num">3</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xee</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">4</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xef</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">2</span>, <span class="num">7</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xf0</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">1</span>, <span class="num">0</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xf1</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">3</span>, <span class="num">5</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xf2</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">2</span>, <span class="num">2</span>, <span class="num">6</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xf3</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">2</span>, <span class="num">6</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xf4</span>:<br/>
+<span class="in4"></span><span class="fn">move_queen</span>(<span class="num">3</span>, <span class="num">5</span>, <span class="num">0</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xf5</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">1</span>, <span class="num">7</span>, <span class="num">1</span>);<br/>
@@ -1669,8 +1991,14 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xfb</span>:<br/>
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="num">2</span>, <span class="num">0</span>, <span class="num">5</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xfc</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">6</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xfe</span>:<br/>
 <span class="in4"></span><span class="fn">move_knight</span>(<span class="num">2</span>, <span class="num">7</span>, <span class="num">2</span>);<br/>
+<span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0xfd</span>:<br/>
+<span class="in4"></span><span class="fn">move_bishop</span>(<span class="num">3</span>, <span class="num">7</span>, <span class="num">7</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xff</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="num">5</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
