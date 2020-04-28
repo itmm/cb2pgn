@@ -44,7 +44,7 @@
 		return result;
 	}
 
-#line 176 "index.md"
+#line 434 "index.md"
 
 	std::string to_str_not_null(
 		int value,
@@ -55,7 +55,7 @@
 		) : placeholder;
 	}
 
-#line 214 "index.md"
+#line 472 "index.md"
 
 	void print_player(std::ifstream &in, int nr) {
 		if (! in.seekg(32 + 67 * nr, std::ifstream::beg)) {
@@ -76,7 +76,7 @@
 		}
 	}
 
-#line 273 "index.md"
+#line 531 "index.md"
 
 	int get_int(
 		std::istream &in, int len = 4
@@ -89,7 +89,7 @@
 		return result;
 	}
 
-#line 288 "index.md"
+#line 546 "index.md"
 
 	#include <memory>
 
@@ -740,7 +740,7 @@
 		}
 	}
 
-#line 947 "index.md"
+#line 1205 "index.md"
 
 	void test_1_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -768,7 +768,7 @@
 		}
 	}
 
-#line 986 "index.md"
+#line 1244 "index.md"
 
 	void test_2_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -783,7 +783,7 @@
 		}
 	}
 
-#line 1014 "index.md"
+#line 1272 "index.md"
 
 	void test_8_fig(
 		Piece *(Board::*fn)(int, bool) const,
@@ -810,7 +810,7 @@
 		}
 	}
 
-#line 1075 "index.md"
+#line 1333 "index.md"
 
 	void test_add(const Position &p, int f, int r, const std::string &exp) {
 		Position q { p + Position { f, r } };
@@ -820,7 +820,7 @@
 		}
 	}
 
-#line 1096 "index.md"
+#line 1354 "index.md"
 
 	bool move_piece(std::ostream &out, Piece *(Board::*fn)(int, bool) const, int nr, int f, int r) {
 		Piece *from { (brd.*fn)(nr, false) };
@@ -835,7 +835,7 @@
 		return true;
 	}
 
-#line 1113 "index.md"
+#line 1371 "index.md"
 
 	void move_king(std::ostream &out, int f, int r) {
 		if (! move_piece(out, &Board::king, 1, f, r)) {
@@ -843,7 +843,7 @@
 		}
 	}
 
-#line 1123 "index.md"
+#line 1381 "index.md"
 
 	void move_queen(std::ostream &out, int nr, int f, int r) {
 		if (! move_piece(out, &Board::queen, nr, f, r)) {
@@ -851,7 +851,7 @@
 		}
 	}
 
-#line 1133 "index.md"
+#line 1391 "index.md"
 
 	void move_rook(std::ostream &out, int nr, int f, int r) {
 		if (! move_piece(out, &Board::rook, nr, f, r)) {
@@ -859,7 +859,7 @@
 		}
 	}
 
-#line 1143 "index.md"
+#line 1401 "index.md"
 
 	void move_bishop(std::ostream &out, int nr, int f, int r) {
 		if (! move_piece(out, &Board::bishop, nr, f, r)) {
@@ -867,7 +867,7 @@
 		}
 	}
 
-#line 1153 "index.md"
+#line 1411 "index.md"
 
 	void move_knight(std::ostream &out, int nr, int f, int r) {
 		if (! move_piece(out, &Board::knight, nr, f, r)) {
@@ -875,7 +875,7 @@
 		}
 	}
 
-#line 1163 "index.md"
+#line 1421 "index.md"
 
 	void move_pawn(std::ostream &out, int nr, int f, int r) {
 		if (! brd.white()) {
@@ -887,7 +887,7 @@
 		}
 	}
 
-#line 1177 "index.md"
+#line 1435 "index.md"
 
 	void Board::kingside_rochade(std::ostream &out) {
 		Piece *kp { king() };
@@ -910,7 +910,7 @@
 		out << "O-O";
 	}
 
-#line 1202 "index.md"
+#line 1460 "index.md"
 
 	void Board::queenside_rochade(std::ostream &out) {
 		Piece *kp { king() };
@@ -933,7 +933,7 @@
 		out << "O-O-O";
 	}
 
-#line 1227 "index.md"
+#line 1485 "index.md"
 
 	#include <sstream>
 
@@ -950,18 +950,18 @@
 #line 44 "index.md"
  {
 	
-#line 941 "index.md"
+#line 1199 "index.md"
  
 	Board brd;
 
-#line 977 "index.md"
+#line 1235 "index.md"
 
 	test_1_fig(&Board::king, false, "e1");
 	test_1_fig(&Board::king, true, "e8");
 	test_1_fig(&Board::queen, false, "d1");
 	test_1_fig(&Board::queen, true, "d8");
 
-#line 1003 "index.md"
+#line 1261 "index.md"
 
 	test_2_fig(&Board::rook, false, "a1", "h1");
 	test_2_fig(&Board::rook, true, "a8", "h8");
@@ -970,12 +970,12 @@
 	test_2_fig(&Board::bishop, false, "c1", "f1");
 	test_2_fig(&Board::bishop, true, "c8", "f8");
 
-#line 1043 "index.md"
+#line 1301 "index.md"
 
 	test_8_fig(&Board::pawn, false, "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2");
 	test_8_fig(&Board::pawn, true, "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7");
 
-#line 1051 "index.md"
+#line 1309 "index.md"
 
 	for (int f { 1 }; f <= 8; ++f) {
 		if (! brd.get(Position { f, 1 }) || ! brd.get(Position { f, 1 })->white()) {
@@ -997,7 +997,7 @@
 		}
 	}
 
-#line 1087 "index.md"
+#line 1345 "index.md"
  {
 	const auto &wk { *brd.king() };
 	test_add(wk, 0, 0, "e1");
@@ -1070,9 +1070,267 @@
 		std::cout << *c;
 	}
 	if (! entry[49]) { std::cout << '?'; }
+	if (entry[83] & 0xff) {
+		std::cout << ' ';
+		switch (entry[83]) {
+			case 1: std::cout << "AFG"; break;
+			case 2: std::cout << "ALB"; break;
+			case 3: std::cout << "ALG"; break;
+			case 4: std::cout << "ANG"; break;
+			case 5: std::cout << "AND"; break;
+			case 6: std::cout << "ANT"; break;
+			case 7: std::cout << "ARG"; break;
+			case 8: std::cout << "ARM"; break;
+			case 9: std::cout << "AUS"; break;
+			case 10: std::cout << "AUT"; break;
+			case 11: std::cout << "AZE"; break;
+			case 12: std::cout << "BAH"; break;
+			case 13: std::cout << "BHN"; break;
+			case 14: std::cout << "BAN"; break;
+			case 15: std::cout << "BAR"; break;
+			case 16: std::cout << "BLR"; break;
+			case 17: std::cout << "BEL"; break;
+			case 18: std::cout << "BLZ"; break;
+			case 19: std::cout << "BER"; break;
+			case 20: std::cout << "BOL"; break;
+			case 21: std::cout << "BIH"; break;
+			case 22: std::cout << "BOT"; break;
+			case 23: std::cout << "BRA"; break;
+			case 24: std::cout << "IVB"; break;
+			case 25: std::cout << "BRU"; break;
+			case 26: std::cout << "BUL"; break;
+			case 27: std::cout << "BUR"; break;
+			case 28: std::cout << "CAN"; break;
+			case 29: std::cout << "CHI"; break;
+			case 30: std::cout << "CHN"; break;
+			case 31: std::cout << "COL"; break;
+			case 32: std::cout << "CRI"; break;
+			case 33: std::cout << "CRO"; break;
+			case 34: std::cout << "CUB"; break;
+			case 35: std::cout << "CYP"; break;
+			case 36: std::cout << "CZE"; break;
+			case 37: std::cout << "DEN"; break;
+			case 38: std::cout << "DJI"; break;
+			case 39: std::cout << "DOM"; break;
+			case 40: std::cout << "ECU"; break;
+			case 41: std::cout << "EGY"; break;
+			case 42: std::cout << "ENG"; break;
+			case 43: std::cout << "ESP"; break;
+			case 44: std::cout << "EST"; break;
+			case 45: std::cout << "ETH"; break;
+			case 46: std::cout << "FAI"; break;
+			case 47: std::cout << "FIJ"; break;
+			case 48: std::cout << "FIN"; break;
+			case 49: std::cout << "FRA"; break;
+			case 50: std::cout << "FRM"; break;
+			case 51: std::cout << "GAM"; break;
+			case 52: std::cout << "GEO"; break;
+			case 53: std::cout << "GER"; break;
+			case 54: std::cout << "GHA"; break;
+			case 55: std::cout << "GRE"; break;
+			case 56: std::cout << "GUA"; break;
+			case 57: std::cout << "GCI"; break;
+			case 58: std::cout << "GUY"; break;
+			case 59: std::cout << "HAI"; break;
+			case 60: std::cout << "HON"; break;
+			case 61: std::cout << "HKG"; break;
+			case 62: std::cout << "HUN"; break;
+			case 63: std::cout << "ISL"; break;
+			case 64: std::cout << "IND"; break;
+			case 65: std::cout << "INA"; break;
+			case 66: std::cout << "IRI"; break;
+			case 67: std::cout << "IRQ"; break;
+			case 68: std::cout << "ISR"; break;
+			case 69: std::cout << "IRL"; break;
+			case 70: std::cout << "ITA"; break;
+			case 71: std::cout << "IVO"; break;
+			case 72: std::cout << "JAM"; break;
+			case 73: std::cout << "JPN"; break;
+			case 74: std::cout << "JCI"; break;
+			case 75: std::cout << "JOR"; break;
+			case 76: std::cout << "KAZ"; break;
+			case 77: std::cout << "KEN"; break;
+			case 78: std::cout << "KOR"; break;
+			case 79: std::cout << "KGZ"; break;
+			case 80: std::cout << "KUW"; break;
+			case 81: std::cout << "LAT"; break;
+			case 82: std::cout << "LBN"; break;
+			case 83: std::cout << "LBY"; break;
+			case 84: std::cout << "LIE"; break;
+			case 85: std::cout << "LTU"; break;
+			case 86: std::cout << "LUX"; break;
+			case 87: std::cout << "MAC"; break;
+			case 88: std::cout << "MAD"; break;
+			case 89: std::cout << "MAS"; break;
+			case 90: std::cout << "MLI"; break;
+			case 91: std::cout << "MLT"; break;
+			case 92: std::cout << "MAU"; break;
+			case 93: std::cout << "MRI"; break;
+			case 94: std::cout << "MEX"; break;
+			case 95: std::cout << "MDA"; break;
+			case 96: std::cout << "MNC"; break;
+			case 97: std::cout << "MGL"; break;
+			case 98: std::cout << "MAR"; break;
+			case 99: std::cout << "MOZ"; break;
+			case 100: std::cout << "MYA"; break;
+			case 101: std::cout << "NAM"; break;
+			case 102: std::cout << "NEP"; break;
+			case 103: std::cout << "NED"; break;
+			case 104: std::cout << "AHO"; break;
+			case 105: std::cout << "NZL"; break;
+			case 106: std::cout << "NCA"; break;
+			case 107: std::cout << "NGR"; break;
+			case 108: std::cout << "NOR"; break;
+			case 109: std::cout << "PAK"; break;
+			case 110: std::cout << "PLE"; break;
+			case 111: std::cout << "PAN"; break;
+			case 112: std::cout << "PNG"; break;
+			case 113: std::cout << "PAR"; break;
+			case 114: std::cout << "PER"; break;
+			case 115: std::cout << "PHI"; break;
+			case 116: std::cout << "POL"; break;
+			case 117: std::cout << "POR"; break;
+			case 118: std::cout << "PUR"; break;
+			case 119: std::cout << "QAT"; break;
+			case 120: std::cout << "ROM"; break;
+			case 121: std::cout << "RUS"; break;
+			case 122: std::cout << "ESA"; break;
+			case 123: std::cout << "SMR"; break;
+			case 124: std::cout << "SCO"; break;
+			case 125: std::cout << "SEN"; break;
+			case 126: std::cout << "SEY"; break;
+			case 127: std::cout << "SIN"; break;
+			case 128: std::cout << "SVK"; break;
+			case 129: std::cout << "SLO"; break;
+			case 130: std::cout << "RSA"; break;
+			case 131: std::cout << "SRI"; break;
+			case 132: std::cout << "SUD"; break;
+			case 133: std::cout << "SUR"; break;
+			case 134: std::cout << "SWE"; break;
+			case 135: std::cout << "SUI"; break;
+			case 136: std::cout << "SYR"; break;
+			case 137: std::cout << "TJK"; break;
+			case 138: std::cout << "TAN"; break;
+			case 139: std::cout << "THA"; break;
+			case 140: std::cout << "TRI"; break;
+			case 141: std::cout << "TUN"; break;
+			case 142: std::cout << "TUR"; break;
+			case 143: std::cout << "TKM"; break;
+			case 144: std::cout << "UGA"; break;
+			case 145: std::cout << "UKR"; break;
+			case 146: std::cout << "UAE"; break;
+			case 147: std::cout << "USA"; break;
+			case 148: std::cout << "URU"; break;
+			case 149: std::cout << "URS"; break;
+			case 150: std::cout << "UZB"; break;
+			case 151: std::cout << "VEN"; break;
+			case 152: std::cout << "VIE"; break;
+			case 153: std::cout << "ISV"; break;
+			case 154: std::cout << "WLS"; break;
+			case 155: std::cout << "YEM"; break;
+			case 156: std::cout << "YUG"; break;
+			case 157: std::cout << "ZAM"; break;
+			case 158: std::cout << "ZIM"; break;
+			case 159: std::cout << "ZRE"; break;
+			case 160: std::cout << "DDR"; break;
+			case 161: std::cout << "CSR"; break;
+			case 162: std::cout << "CAM"; break;
+			case 163: std::cout << "CHD"; break;
+			case 164: std::cout << "KAP"; break;
+			case 165: std::cout << "KBA"; break;
+			case 166: std::cout << "COM"; break;
+			case 167: std::cout << "CON"; break;
+			case 168: std::cout << "NKO"; break;
+			case 169: std::cout << "LAO"; break;
+			case 170: std::cout << "LES"; break;
+			case 171: std::cout << "MWI"; break;
+			case 172: std::cout << "MDV"; break;
+			case 173: std::cout << "MSH"; break;
+			case 174: std::cout << "OMN"; break;
+			case 175: std::cout << "NAU"; break;
+			case 176: std::cout << "MIC"; break;
+			case 177: std::cout << "NIG"; break;
+			case 178: std::cout << "SAU"; break;
+			case 179: std::cout << "TOG"; break;
+			case 180: std::cout << "TON"; break;
+			case 181: std::cout << "VAN"; break;
+			case 182: std::cout << "VAT"; break;
+			case 183: std::cout << "TUV"; break;
+			case 184: std::cout << "SWA"; break;
+			case 185: std::cout << "SIE"; break;
+			case 186: std::cout << "SLU"; break;
+			case 187: std::cout << "PAP"; break;
+			case 188: std::cout << "SVI"; break;
+			case 189: std::cout << "SAM"; break;
+			case 190: std::cout << "SKI"; break;
+			case 191: std::cout << "SAL"; break;
+			case 192: std::cout << "GE2"; break;
+			case 193: std::cout << "ZAR"; break;
+			case 194: std::cout << "RWA"; break;
+			case 195: std::cout << "LBR"; break;
+			case 196: std::cout << "NET"; break;
+			case 197: std::cout << "TWN"; break;
+			case 198: std::cout << "ASU"; break;
+			case 199: std::cout << "AGG"; break;
+			case 200: std::cout << "BNN"; break;
+			case 201: std::cout << "BTN"; break;
+			case 202: std::cout << "BRI"; break;
+			case 203: std::cout << "CMB"; break;
+			case 204: std::cout << "CAY"; break;
+			case 205: std::cout << "CAR"; break;
+			case 206: std::cout << "CIB"; break;
+			case 207: std::cout << "CIA"; break;
+			case 208: std::cout << "COA"; break;
+			case 209: std::cout << "CIN"; break;
+			case 210: std::cout << "ELG"; break;
+			case 211: std::cout << "ERI"; break;
+			case 212: std::cout << "FGB"; break;
+			case 213: std::cout << "FRG"; break;
+			case 214: std::cout << "FRP"; break;
+			case 215: std::cout << "GAB"; break;
+			case 216: std::cout << "GGB"; break;
+			case 217: std::cout << "GRA"; break;
+			case 218: std::cout << "GRL"; break;
+			case 219: std::cout << "FGA"; break;
+			case 220: std::cout << "GMA"; break;
+			case 221: std::cout << "GUI"; break;
+			case 222: std::cout << "GUB"; break;
+			case 223: std::cout << "IOM"; break;
+			case 224: std::cout << "JMY"; break;
+			case 225: std::cout << "MFR"; break;
+			case 226: std::cout << "MYF"; break;
+			case 227: std::cout << "MSG"; break;
+			case 228: std::cout << "NCF"; break;
+			case 229: std::cout << "NNN"; break;
+			case 230: std::cout << "NNA"; break;
+			case 231: std::cout << "NMI"; break;
+			case 232: std::cout << "OTM"; break;
+			case 233: std::cout << "PAL"; break;
+			case 234: std::cout << "PIG"; break;
+			case 235: std::cout << "RUF"; break;
+			case 236: std::cout << "SAO"; break;
+			case 237: std::cout << "SOM"; break;
+			case 238: std::cout << "SVN"; break;
+			case 239: std::cout << "HGB"; break;
+			case 240: std::cout << "PGB"; break;
+			case 241: std::cout << "TKI"; break;
+			case 242: std::cout << "TCI"; break;
+			case 243: std::cout << "WFR"; break;
+			case 244: std::cout << "NIR"; break;
+			case 245: std::cout << "ISS"; break;
+			case 246: std::cout << "GBR"; break;
+			case 247: std::cout << "SAA"; break;
+			case 248: std::cout << "MNT"; break;
+			case 249: std::cout << "SER"; break;
+			case 250: std::cout << "CAT"; break;
+			case 251: std::cout << "BAS"; break;
+			case 252: std::cout << "KOS"; break;
+			default: std::cout << "???";
+		}
+	}
 	std::cout << "\"]\n";
 } 
-#line 164 "index.md"
+#line 422 "index.md"
  {
 	int date { get_int(
 		main_entry + 24, 3
@@ -1081,7 +1339,7 @@
 	int month { (date & 0x1e0) >> 5 };
 	int year { date >> 9 };
 	
-#line 189 "index.md"
+#line 447 "index.md"
 
 	std::cout << "[Date \"" << 
 		to_str_not_null(year, "????") <<
@@ -1091,10 +1349,10 @@
 		to_str_not_null(day, "??") <<
 		"\"]\n";
 
-#line 171 "index.md"
+#line 429 "index.md"
 ;
 } 
-#line 201 "index.md"
+#line 459 "index.md"
  {
 	int round { main_entry[29] };
 	std::cout << "[Round \"";
@@ -1105,7 +1363,7 @@
 	}
 	std::cout << "\"]\n";
 } 
-#line 237 "index.md"
+#line 495 "index.md"
  {
 	std::cout << "[White \"";
 	print_player(player_file, get_int(main_entry + 9, 3));
@@ -1114,7 +1372,7 @@
 	print_player(player_file, get_int(main_entry + 12, 3));
 	std::cout << "\"]\n";
 } 
-#line 248 "index.md"
+#line 506 "index.md"
 
 	std::string result;
 	switch (main_entry[27]) {
@@ -1130,10 +1388,10 @@
 	std::cout << "[Result \"" <<
 		result << "\"]\n";
 
-#line 266 "index.md"
+#line 524 "index.md"
 
 	
-#line 1233 "index.md"
+#line 1491 "index.md"
  {
 	brd.~Board();
 	new (&brd) Board();
@@ -1974,7 +2232,7 @@ static short MoveNumberLookup[256] = {
 		brd.switch_players();
 	}
 } 
-#line 267 "index.md"
+#line 525 "index.md"
 ;
 	std::cout << ' ' << result << "\n\n";
 
