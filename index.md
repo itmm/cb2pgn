@@ -265,7 +265,7 @@
 ```
 @add(process game)
 	@put(process moves);
-	std::cout << result << "\n\n";
+	std::cout << ' ' << result << "\n\n";
 @end(process game)
 ```
 
@@ -382,12 +382,17 @@
 			if (pos == *this) { return this; };
 			return next() ? next()->find(pos) : nullptr;
 		}
-		bool any_attacks(Board &brd, const Position &p) {
-			if (can_move_to(brd, p)) {
+		bool any_attacks(Board &brd, const Position &p, bool verbose = false) {
+			if (*this && can_move_to(brd, p)) {
+				if (verbose) {
+					std::cout << "{attack from " << name() << (std::string) *this << " -> " << (std::string) p << "}";
+				}
 				return true;
 			}
-			return next() ? next()->any_attacks(brd, p) : false;
+			return next() ? next()->any_attacks(brd, p, verbose) : false;
 		}
+		bool can_avoid_check_on(Board &brd, const Position &to, Piece *nw);
+		bool can_avoid_check(Board &brd);
 	};
 
 	struct Side {
@@ -411,20 +416,23 @@
 			r = pawns.get() ? pawns.get()->find(pos) : nullptr;
 			return r;
 		}
-		bool any_attacks(Board &brd, const Position &p) {
-			if (queens && queens->any_attacks(brd, p)) {
+		bool any_attacks(Board &brd, const Position &p, bool verbose = false) {
+			if (king && king->any_attacks(brd, p, verbose)) {
 				return true;
 			}
-			if (rooks && rooks->any_attacks(brd, p)) {
+			if (queens && queens->any_attacks(brd, p, verbose)) {
 				return true;
 			}
-			if (bishops && bishops->any_attacks(brd, p)) {
+			if (rooks && rooks->any_attacks(brd, p, verbose)) {
 				return true;
 			}
-			if (knights && knights->any_attacks(brd, p)) {
+			if (bishops && bishops->any_attacks(brd, p, verbose)) {
 				return true;
 			}
-			return pawns->any_attacks(brd, p);
+			if (knights && knights->any_attacks(brd, p, verbose)) {
+				return true;
+			}
+			return pawns->any_attacks(brd, p, verbose);
 		}
 		bool remove_inner(Piece *p, Piece *prev) {
 			while (prev) {
@@ -475,6 +483,27 @@
 			}
 			return false;
 		}
+		bool can_avoid_check(Board &brd) {
+			if (king) {
+				if (king->can_avoid_check(brd)) { return true; }
+			}
+			if (queens) {
+				if (queens->can_avoid_check(brd)) { return true; }
+			}
+			if (rooks) {
+				if (rooks->can_avoid_check(brd)) { return true; }
+			}
+			if (bishops) {
+				if (bishops->can_avoid_check(brd)) { return true; }
+			}
+			if (knights) {
+				if (knights->can_avoid_check(brd)) { return true; }
+			}
+			if (pawns) {
+				if (pawns->can_avoid_check(brd)) { return true; }
+			}
+			return false;
+		}
 		Piece *add_piece(Piece *np, std::unique_ptr<Piece> &lst) {
 			if (! lst) {
 				lst.reset(np);
@@ -516,23 +545,16 @@
 		}
 		bool white() const { return &white_ == cur_; }
 		bool mate() { 
-			Piece &k { *other_->king.get() };
-			for (int r { -1 }; r <= 1; ++r) {
-				for (int f { -1 }; f <= 1; ++f) {
-					if (! r && ! f) { continue; }
-					Position to {k + Position { f, r }};
-					if (to && k.can_move_to(*this, to)) {
-						if (! cur_->any_attacks(*this, to)) {
-							return false;
-						}
-					}
-				}
-			}
-			return true;
+			switch_players();
+			bool result { ! cur_->can_avoid_check(*this) };
+			switch_players();
+			return result;
 		}
-		bool check() { 
-			if (other_->king) {
-				return cur_->any_attacks(*this, *other_->king.get());
+		bool check(bool other = true, bool verbose = false) { 
+			Side *s { other ? other_ : cur_ };
+			Side *o { other ? cur_ : other_ };
+			if (s->king) {
+				return o->any_attacks(*this, *s->king.get(), verbose);
 			}
 			return false;
 		}
@@ -598,6 +620,64 @@
 		return find(nr, other ? other_->pawns.get() : cur_->pawns.get());
 	}
 
+	bool Piece::can_avoid_check_on(Board &brd, const Position &to, Piece *nw) {
+		if (pawn() && ! nw && (to.rank() == 1 || to.rank() == 8)) {
+			if (can_avoid_check_on(brd, to, brd.add_queen(to))) {
+				return true;
+			}
+			if (can_avoid_check_on(brd, to, brd.add_knight(to))) {
+				return true;
+			}
+			if (can_avoid_check_on(brd, to, brd.add_rook(to))) {
+				return true;
+			}
+			if (can_avoid_check_on(brd, to, brd.add_bishop(to))) {
+				return true;
+			}
+		} else {
+			Position from { file(), rank() };
+			Piece *old { brd.get(to) };
+			if (old) { old->file(-old->file()); }
+			if (nw) {
+				file(-file());
+			} else {
+				file(to.file());
+				rank(to.rank());
+			}
+
+			bool can_avoid { ! brd.check(false) };
+			if (name() == "Kxx") {
+				std::cout << "{" << (std::string) *this << ": "
+					<< (can_avoid ? "1" : "0") << (nw ? "n" : "") << "}";
+			}
+
+			file(from.file());
+			rank(from.rank());
+			if (old) { old->file(-old->file()); }
+			if (nw) { brd.remove(nw); };
+
+			return can_avoid;
+		}
+		return false;
+	}
+	bool Piece::can_avoid_check(Board &brd) {
+		Position p;
+		if (*this) {
+			for (int r { 1 }; r <= 8; ++r) {
+				p.rank(r);
+				for (int f { 1 }; f <= 8; ++f) {
+					p.file(f);
+					if (! can_move_to(brd, p)) {
+						continue;
+					}
+					if (can_avoid_check_on(brd, p, nullptr)) {
+						return true;
+					}
+				}
+			}
+		}
+		return next() ? next()->can_avoid_check(brd) : false;
+	}
 	void Board::move(std::ostream &out, Piece *first, Piece *from, const Position &to) {
 		if (! from) {
 			fail("no piece to move from");
@@ -677,12 +757,9 @@
 		Rook_Piece(std::unique_ptr<Piece> &&next, int file = 0, int rank = 0, bool white = true): Piece { std::move(next), file, rank, white } {}
 
 		bool can_move_to(Board &brd, const Position &to) override {
-			//std::cout << "{R" << (std::string) *this << " -> " << (std::string) to << ": ";
 			if (to.file() == file() || to.rank() == rank()) {
-				//std::cout << Piece::can_move_to(brd, to) << " (+)} ";
 				return Piece::can_move_to(brd, to);
 			}
-			//std::cout << " false} ";
 			return false;
 		}
 		std::string name() const override {
@@ -762,7 +839,7 @@
 		bool can_move_to(Board &brd, const Position &to) override {
 			Piece *to_piece { brd.get(to) };
 			if (rank() == 2 && to.rank() == 4) {
-				return file() == to.file() && ! to_piece;
+				return file() == to.file() && ! to_piece && ! brd.get(*this + Position { 0, 1});
 			} else if (rank() + 1 == to.rank()) {
 				if (file() == to.file()) {
 					return ! to_piece;
@@ -770,8 +847,10 @@
 				Position sq { (to - *this).square() };
 				if (sq.file() == 1) {
 					if (to_piece) { return ! to_piece->white(); }
-					Piece *p { brd.get(to + Position{0, 1}) };
-					return p && ! p->white() && p->pawn();
+					if (rank() == 5) {
+						Piece *p { brd.get(to + Position{0, -1}) };
+						return p && ! p->white() && p->pawn();
+					}
 				}
 			}
 			return false;
@@ -788,7 +867,7 @@
 		bool can_move_to(Board &brd, const Position &to) override {
 			Piece *to_piece { brd.get(to) };
 			if (rank() == 7 && to.rank() == 5) {
-				return file() == to.file() && ! to_piece;
+				return file() == to.file() && ! to_piece && ! brd.get(*this + Position { 0, -1 });
 			} else if (rank() - 1 == to) {
 				if (file() == to.file()) {
 					return ! to_piece;
@@ -796,8 +875,10 @@
 				Position sq { (to - *this).square() };
 				if (sq.file() == 1) {
 					if (to_piece) { return to_piece->white(); }
-					Piece *p { brd.get(to + Position{0, -1}) };
-					return p && p->white() && p->pawn();
+					if (rank() == 4) {
+						Piece *p { brd.get(to + Position{0, 1}) };
+						return p && p->white() && p->pawn();
+					}
 				}
 			}
 			return false;
@@ -962,6 +1043,31 @@
 @add(unit-tests)
 	test_8_fig(&Board::pawn, false, "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2");
 	test_8_fig(&Board::pawn, true, "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7");
+@end(unit-tests)
+```
+
+	
+```
+@add(unit-tests)
+	for (int f { 1 }; f <= 8; ++f) {
+		if (! brd.get(Position { f, 1 }) || ! brd.get(Position { f, 1 })->white()) {
+			fail("not white on " + (std::string) Position { f, 1 });
+		}
+		if (! brd.get(Position { f, 2 }) || ! brd.get(Position { f, 2 })->white()) {
+			fail("not white on " + (std::string) Position { f, 2 });
+		}
+		if (! brd.get(Position { f, 7 }) || brd.get(Position { f, 7 })->white()) {
+			fail("no black on " + (std::string) Position { f, 7 });
+		}
+		if (! brd.get(Position { f, 8 }) || brd.get(Position { f, 8 })->white()) {
+			fail("no black on " + (std::string) Position { f, 8 });
+		}
+		for (int r { 3 }; r <= 6; ++r) {
+			if (brd.get(Position { f, r })) {
+				fail("not empty on " + (std::string) Position { f, r });
+			}
+		}
+	}
 @end(unit-tests)
 ```
 
@@ -1186,7 +1292,7 @@ static short MoveNumberLookup[256] = {
 		if (! (nr & 1)) {
 			out << (1 + (nr >> 1)) << ". ";
 		}
-		//out << '{' << std::hex << ch << std::dec << "} ";
+		// out << '{' << std::hex << ch << std::dec << "} ";
 
 		switch (ch) {
 			case 0x00:

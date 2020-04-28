@@ -1,3 +1,5 @@
-* no mate if check can be blocked or checking figure can be captured
 * board setup
+* check rochade on mate
+* handle en-passant on mate
+* add nation to site
 

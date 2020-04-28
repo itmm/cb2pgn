@@ -298,7 +298,7 @@
 <code>
 <span class="macro">@add(<span class="name">process game</span>)</span><br/>
 <span class="in1"></span><span class="macro">@put(<span class="name">process moves</span>)</span>;<br/>
-<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="var">result</span> &lt;&lt; <span class="str">"\n\n"</span>;<br/>
+<span class="in1"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">' '</span> &lt;&lt; <span class="var">result</span> &lt;&lt; <span class="str">"\n\n"</span>;<br/>
 <span class="macro">@end(<span class="name">process game</span>)</span><br/>
 </code></div>
 </div>
@@ -417,12 +417,17 @@
 <span class="in3"></span><span class="keyword">if</span> (<span class="var">pos</span> == *<span class="var">this</span>) { <span class="keyword">return</span> <span class="var">this</span>; };<br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="fn">next</span>() ? <span class="fn">next</span>()-&gt;<span class="fn">find</span>(<span class="var">pos</span>) : <span class="num">nullptr</span>;<br/>
 <span class="in2"></span>}<br/>
-<span class="in2"></span><span class="type">bool</span> <span class="fn">any_attacks</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">p</span>) {<br/>
-<span class="in3"></span><span class="keyword">if</span> (<span class="fn">can_move_to</span>(<span class="var">brd</span>, <span class="var">p</span>)) {<br/>
+<span class="in2"></span><span class="type">bool</span> <span class="fn">any_attacks</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">p</span>, <span class="type">bool</span> <span class="var">verbose</span> = <span class="num">false</span>) {<br/>
+<span class="in3"></span><span class="keyword">if</span> (*<span class="var">this</span> &amp;&amp; <span class="fn">can_move_to</span>(<span class="var">brd</span>, <span class="var">p</span>)) {<br/>
+<span class="in4"></span><span class="keyword">if</span> (<span class="var">verbose</span>) {<br/>
+<span class="in5"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"{attack from "</span> &lt;&lt; <span class="fn">name</span>() &lt;&lt; (<span class="type">std</span>::<span class="type">string</span>) *<span class="var">this</span> &lt;&lt; <span class="str">" -&gt; "</span> &lt;&lt; (<span class="type">std</span>::<span class="type">string</span>) <span class="var">p</span> &lt;&lt; <span class="str">"}"</span>;<br/>
+<span class="in4"></span>}<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
 <span class="in3"></span>}<br/>
-<span class="in3"></span><span class="keyword">return</span> <span class="fn">next</span>() ? <span class="fn">next</span>()-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>) : <span class="num">false</span>;<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="fn">next</span>() ? <span class="fn">next</span>()-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="var">verbose</span>) : <span class="num">false</span>;<br/>
 <span class="in2"></span>}<br/>
+<span class="in2"></span><span class="type">bool</span> <span class="fn">can_avoid_check_on</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">to</span>, <span class="type">Piece</span> *<span class="var">nw</span>);<br/>
+<span class="in2"></span><span class="type">bool</span> <span class="fn">can_avoid_check</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>);<br/>
 <span class="in1"></span>};<br/>
 <br/>
 <span class="in1"></span><span class="type">struct</span> <span class="type">Side</span> {<br/>
@@ -446,20 +451,23 @@
 <span class="in3"></span><span class="var">r</span> = <span class="var">pawns</span>.<span class="fn">get</span>() ? <span class="var">pawns</span>.<span class="fn">get</span>()-&gt;<span class="fn">find</span>(<span class="var">pos</span>) : <span class="num">nullptr</span>;<br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="var">r</span>;<br/>
 <span class="in2"></span>}<br/>
-<span class="in2"></span><span class="type">bool</span> <span class="fn">any_attacks</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">p</span>) {<br/>
-<span class="in3"></span><span class="keyword">if</span> (<span class="var">queens</span> &amp;&amp; <span class="var">queens</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>)) {<br/>
+<span class="in2"></span><span class="type">bool</span> <span class="fn">any_attacks</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">p</span>, <span class="type">bool</span> <span class="var">verbose</span> = <span class="num">false</span>) {<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">king</span> &amp;&amp; <span class="var">king</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="var">verbose</span>)) {<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
 <span class="in3"></span>}<br/>
-<span class="in3"></span><span class="keyword">if</span> (<span class="var">rooks</span> &amp;&amp; <span class="var">rooks</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>)) {<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">queens</span> &amp;&amp; <span class="var">queens</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="var">verbose</span>)) {<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
 <span class="in3"></span>}<br/>
-<span class="in3"></span><span class="keyword">if</span> (<span class="var">bishops</span> &amp;&amp; <span class="var">bishops</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>)) {<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">rooks</span> &amp;&amp; <span class="var">rooks</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="var">verbose</span>)) {<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
 <span class="in3"></span>}<br/>
-<span class="in3"></span><span class="keyword">if</span> (<span class="var">knights</span> &amp;&amp; <span class="var">knights</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>)) {<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">bishops</span> &amp;&amp; <span class="var">bishops</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="var">verbose</span>)) {<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
 <span class="in3"></span>}<br/>
-<span class="in3"></span><span class="keyword">return</span> <span class="var">pawns</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>);<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">knights</span> &amp;&amp; <span class="var">knights</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="var">verbose</span>)) {<br/>
+<span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">pawns</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="var">verbose</span>);<br/>
 <span class="in2"></span>}<br/>
 <span class="in2"></span><span class="type">bool</span> <span class="fn">remove_inner</span>(<span class="type">Piece</span> *<span class="var">p</span>, <span class="type">Piece</span> *<span class="var">prev</span>) {<br/>
 <span class="in3"></span><span class="keyword">while</span> (<span class="var">prev</span>) {<br/>
@@ -510,6 +518,27 @@
 <span class="in3"></span>}<br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="num">false</span>;<br/>
 <span class="in2"></span>}<br/>
+<span class="in2"></span><span class="type">bool</span> <span class="fn">can_avoid_check</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>) {<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">king</span>) {<br/>
+<span class="in4"></span><span class="keyword">if</span> (<span class="var">king</span>-&gt;<span class="fn">can_avoid_check</span>(<span class="var">brd</span>)) { <span class="keyword">return</span> <span class="num">true</span>; }<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">queens</span>) {<br/>
+<span class="in4"></span><span class="keyword">if</span> (<span class="var">queens</span>-&gt;<span class="fn">can_avoid_check</span>(<span class="var">brd</span>)) { <span class="keyword">return</span> <span class="num">true</span>; }<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">rooks</span>) {<br/>
+<span class="in4"></span><span class="keyword">if</span> (<span class="var">rooks</span>-&gt;<span class="fn">can_avoid_check</span>(<span class="var">brd</span>)) { <span class="keyword">return</span> <span class="num">true</span>; }<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">bishops</span>) {<br/>
+<span class="in4"></span><span class="keyword">if</span> (<span class="var">bishops</span>-&gt;<span class="fn">can_avoid_check</span>(<span class="var">brd</span>)) { <span class="keyword">return</span> <span class="num">true</span>; }<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">knights</span>) {<br/>
+<span class="in4"></span><span class="keyword">if</span> (<span class="var">knights</span>-&gt;<span class="fn">can_avoid_check</span>(<span class="var">brd</span>)) { <span class="keyword">return</span> <span class="num">true</span>; }<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">pawns</span>) {<br/>
+<span class="in4"></span><span class="keyword">if</span> (<span class="var">pawns</span>-&gt;<span class="fn">can_avoid_check</span>(<span class="var">brd</span>)) { <span class="keyword">return</span> <span class="num">true</span>; }<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="num">false</span>;<br/>
+<span class="in2"></span>}<br/>
 <span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_piece</span>(<span class="type">Piece</span> *<span class="var">np</span>, <span class="type">std</span>::<span class="var">unique_ptr</span>&lt;<span class="type">Piece</span>&gt; &amp;<span class="var">lst</span>) {<br/>
 <span class="in3"></span><span class="keyword">if</span> (! <span class="var">lst</span>) {<br/>
 <span class="in4"></span><span class="var">lst</span>.<span class="fn">reset</span>(<span class="var">np</span>);<br/>
@@ -551,23 +580,16 @@
 <span class="in2"></span>}<br/>
 <span class="in2"></span><span class="type">bool</span> <span class="fn">white</span>() <span class="type">const</span> { <span class="keyword">return</span> &amp;<span class="var">white_</span> == <span class="var">cur_</span>; }<br/>
 <span class="in2"></span><span class="type">bool</span> <span class="fn">mate</span>() { <br/>
-<span class="in3"></span><span class="type">Piece</span> &amp;<span class="var">k</span> { *<span class="var">other_</span>-&gt;<span class="var">king</span>.<span class="fn">get</span>() };<br/>
-<span class="in3"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">r</span> { -<span class="num">1</span> }; <span class="var">r</span> &lt;= <span class="num">1</span>; ++<span class="var">r</span>) {<br/>
-<span class="in4"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">f</span> { -<span class="num">1</span> }; <span class="var">f</span> &lt;= <span class="num">1</span>; ++<span class="var">f</span>) {<br/>
-<span class="in5"></span><span class="keyword">if</span> (! <span class="var">r</span> &amp;&amp; ! <span class="var">f</span>) { <span class="keyword">continue</span>; }<br/>
-<span class="in5"></span><span class="type">Position</span> <span class="var">to</span> {<span class="var">k</span> + <span class="type">Position</span> { <span class="var">f</span>, <span class="var">r</span> }};<br/>
-<span class="in5"></span><span class="keyword">if</span> (<span class="var">to</span> &amp;&amp; <span class="var">k</span>.<span class="fn">can_move_to</span>(*<span class="var">this</span>, <span class="var">to</span>)) {<br/>
-<span class="in6"></span><span class="keyword">if</span> (! <span class="var">cur_</span>-&gt;<span class="fn">any_attacks</span>(*<span class="var">this</span>, <span class="var">to</span>)) {<br/>
-<span class="in7"></span><span class="keyword">return</span> <span class="num">false</span>;<br/>
-<span class="in6"></span>}<br/>
-<span class="in5"></span>}<br/>
-<span class="in4"></span>}<br/>
-<span class="in3"></span>}<br/>
-<span class="in3"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
+<span class="in3"></span><span class="fn">switch_players</span>();<br/>
+<span class="in3"></span><span class="type">bool</span> <span class="var">result</span> { ! <span class="var">cur_</span>-&gt;<span class="fn">can_avoid_check</span>(*<span class="var">this</span>) };<br/>
+<span class="in3"></span><span class="fn">switch_players</span>();<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">result</span>;<br/>
 <span class="in2"></span>}<br/>
-<span class="in2"></span><span class="type">bool</span> <span class="fn">check</span>() { <br/>
-<span class="in3"></span><span class="keyword">if</span> (<span class="var">other_</span>-&gt;<span class="var">king</span>) {<br/>
-<span class="in4"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">any_attacks</span>(*<span class="var">this</span>, *<span class="var">other_</span>-&gt;<span class="var">king</span>.<span class="fn">get</span>());<br/>
+<span class="in2"></span><span class="type">bool</span> <span class="fn">check</span>(<span class="type">bool</span> <span class="var">other</span> = <span class="num">true</span>, <span class="type">bool</span> <span class="var">verbose</span> = <span class="num">false</span>) { <br/>
+<span class="in3"></span><span class="type">Side</span> *<span class="var">s</span> { <span class="var">other</span> ? <span class="var">other_</span> : <span class="var">cur_</span> };<br/>
+<span class="in3"></span><span class="type">Side</span> *<span class="var">o</span> { <span class="var">other</span> ? <span class="var">cur_</span> : <span class="var">other_</span> };<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">s</span>-&gt;<span class="var">king</span>) {<br/>
+<span class="in4"></span><span class="keyword">return</span> <span class="var">o</span>-&gt;<span class="fn">any_attacks</span>(*<span class="var">this</span>, *<span class="var">s</span>-&gt;<span class="var">king</span>.<span class="fn">get</span>(), <span class="var">verbose</span>);<br/>
 <span class="in3"></span>}<br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="num">false</span>;<br/>
 <span class="in2"></span>}<br/>
@@ -633,6 +655,64 @@
 <span class="in2"></span><span class="keyword">return</span> <span class="fn">find</span>(<span class="var">nr</span>, <span class="var">other</span> ? <span class="var">other_</span>-&gt;<span class="var">pawns</span>.<span class="fn">get</span>() : <span class="var">cur_</span>-&gt;<span class="var">pawns</span>.<span class="fn">get</span>());<br/>
 <span class="in1"></span>}<br/>
 <br/>
+<span class="in1"></span><span class="type">bool</span> <span class="type">Piece</span>::<span class="fn">can_avoid_check_on</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">to</span>, <span class="type">Piece</span> *<span class="var">nw</span>) {<br/>
+<span class="in2"></span><span class="keyword">if</span> (<span class="fn">pawn</span>() &amp;&amp; ! <span class="var">nw</span> &amp;&amp; (<span class="var">to</span>.<span class="fn">rank</span>() == <span class="num">1</span> || <span class="var">to</span>.<span class="fn">rank</span>() == <span class="num">8</span>)) {<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="fn">can_avoid_check_on</span>(<span class="var">brd</span>, <span class="var">to</span>, <span class="var">brd</span>.<span class="fn">add_queen</span>(<span class="var">to</span>))) {<br/>
+<span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="fn">can_avoid_check_on</span>(<span class="var">brd</span>, <span class="var">to</span>, <span class="var">brd</span>.<span class="fn">add_knight</span>(<span class="var">to</span>))) {<br/>
+<span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="fn">can_avoid_check_on</span>(<span class="var">brd</span>, <span class="var">to</span>, <span class="var">brd</span>.<span class="fn">add_rook</span>(<span class="var">to</span>))) {<br/>
+<span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="fn">can_avoid_check_on</span>(<span class="var">brd</span>, <span class="var">to</span>, <span class="var">brd</span>.<span class="fn">add_bishop</span>(<span class="var">to</span>))) {<br/>
+<span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
+<span class="in3"></span>}<br/>
+<span class="in2"></span>} <span class="keyword">else</span> {<br/>
+<span class="in3"></span><span class="type">Position</span> <span class="var">from</span> { <span class="fn">file</span>(), <span class="fn">rank</span>() };<br/>
+<span class="in3"></span><span class="type">Piece</span> *<span class="var">old</span> { <span class="var">brd</span>.<span class="fn">get</span>(<span class="var">to</span>) };<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">old</span>) { <span class="var">old</span>-&gt;<span class="fn">file</span>(-<span class="var">old</span>-&gt;<span class="fn">file</span>()); }<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">nw</span>) {<br/>
+<span class="in4"></span><span class="fn">file</span>(-<span class="fn">file</span>());<br/>
+<span class="in3"></span>} <span class="keyword">else</span> {<br/>
+<span class="in4"></span><span class="fn">file</span>(<span class="var">to</span>.<span class="fn">file</span>());<br/>
+<span class="in4"></span><span class="fn">rank</span>(<span class="var">to</span>.<span class="fn">rank</span>());<br/>
+<span class="in3"></span>}<br/>
+<br/>
+<span class="in3"></span><span class="type">bool</span> <span class="var">can_avoid</span> { ! <span class="var">brd</span>.<span class="fn">check</span>(<span class="num">false</span>) };<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="fn">name</span>() == <span class="str">"Kxx"</span>) {<br/>
+<span class="in4"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"{"</span> &lt;&lt; (<span class="type">std</span>::<span class="type">string</span>) *<span class="var">this</span> &lt;&lt; <span class="str">": "</span><br/>
+<span class="in5"></span>&lt;&lt; (<span class="var">can_avoid</span> ? <span class="str">"1"</span> : <span class="str">"0"</span>) &lt;&lt; (<span class="var">nw</span> ? <span class="str">"n"</span> : <span class="str">""</span>) &lt;&lt; <span class="str">"}"</span>;<br/>
+<span class="in3"></span>}<br/>
+<br/>
+<span class="in3"></span><span class="fn">file</span>(<span class="var">from</span>.<span class="fn">file</span>());<br/>
+<span class="in3"></span><span class="fn">rank</span>(<span class="var">from</span>.<span class="fn">rank</span>());<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">old</span>) { <span class="var">old</span>-&gt;<span class="fn">file</span>(-<span class="var">old</span>-&gt;<span class="fn">file</span>()); }<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">nw</span>) { <span class="var">brd</span>.<span class="fn">remove</span>(<span class="var">nw</span>); };<br/>
+<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">can_avoid</span>;<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="keyword">return</span> <span class="num">false</span>;<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">bool</span> <span class="type">Piece</span>::<span class="fn">can_avoid_check</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>) {<br/>
+<span class="in2"></span><span class="type">Position</span> <span class="var">p</span>;<br/>
+<span class="in2"></span><span class="keyword">if</span> (*<span class="var">this</span>) {<br/>
+<span class="in3"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">r</span> { <span class="num">1</span> }; <span class="var">r</span> &lt;= <span class="num">8</span>; ++<span class="var">r</span>) {<br/>
+<span class="in4"></span><span class="var">p</span>.<span class="fn">rank</span>(<span class="var">r</span>);<br/>
+<span class="in4"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">f</span> { <span class="num">1</span> }; <span class="var">f</span> &lt;= <span class="num">8</span>; ++<span class="var">f</span>) {<br/>
+<span class="in5"></span><span class="var">p</span>.<span class="fn">file</span>(<span class="var">f</span>);<br/>
+<span class="in5"></span><span class="keyword">if</span> (! <span class="fn">can_move_to</span>(<span class="var">brd</span>, <span class="var">p</span>)) {<br/>
+<span class="in6"></span><span class="keyword">continue</span>;<br/>
+<span class="in5"></span>}<br/>
+<span class="in5"></span><span class="keyword">if</span> (<span class="fn">can_avoid_check_on</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="num">nullptr</span>)) {<br/>
+<span class="in6"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
+<span class="in5"></span>}<br/>
+<span class="in4"></span>}<br/>
+<span class="in3"></span>}<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="keyword">return</span> <span class="fn">next</span>() ? <span class="fn">next</span>()-&gt;<span class="fn">can_avoid_check</span>(<span class="var">brd</span>) : <span class="num">false</span>;<br/>
+<span class="in1"></span>}<br/>
 <span class="in1"></span><span class="type">void</span> <span class="type">Board</span>::<span class="fn">move</span>(<span class="type">std</span>::<span class="type">ostream</span> &amp;<span class="var">out</span>, <span class="type">Piece</span> *<span class="var">first</span>, <span class="type">Piece</span> *<span class="var">from</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">to</span>) {<br/>
 <span class="in2"></span><span class="keyword">if</span> (! <span class="var">from</span>) {<br/>
 <span class="in3"></span><span class="fn">fail</span>(<span class="str">"no piece to move from"</span>);<br/>
@@ -712,12 +792,9 @@
 <span class="in2"></span><span class="fn">Rook_Piece</span>(<span class="type">std</span>::<span class="var">unique_ptr</span>&lt;<span class="type">Piece</span>&gt; &amp;&amp;<span class="var">next</span>, <span class="type">int</span> <span class="var">file</span> = <span class="num">0</span>, <span class="type">int</span> <span class="var">rank</span> = <span class="num">0</span>, <span class="type">bool</span> <span class="var">white</span> = <span class="num">true</span>): <span class="type">Piece</span> { <span class="type">std</span>::<span class="fn">move</span>(<span class="var">next</span>), <span class="var">file</span>, <span class="var">rank</span>, <span class="var">white</span> } {}<br/>
 <br/>
 <span class="in2"></span><span class="type">bool</span> <span class="fn">can_move_to</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">to</span>) <span class="keyword">override</span> {<br/>
-<span class="in3"></span>//<span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"{R"</span> &lt;&lt; (<span class="type">std</span>::<span class="type">string</span>) *<span class="var">this</span> &lt;&lt; <span class="str">" -&gt; "</span> &lt;&lt; (<span class="type">std</span>::<span class="type">string</span>) <span class="var">to</span> &lt;&lt; <span class="str">": "</span>;<br/>
 <span class="in3"></span><span class="keyword">if</span> (<span class="var">to</span>.<span class="fn">file</span>() == <span class="fn">file</span>() || <span class="var">to</span>.<span class="fn">rank</span>() == <span class="fn">rank</span>()) {<br/>
-<span class="in4"></span>//<span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="type">Piece</span>::<span class="fn">can_move_to</span>(<span class="var">brd</span>, <span class="var">to</span>) &lt;&lt; <span class="str">" (+)} "</span>;<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="type">Piece</span>::<span class="fn">can_move_to</span>(<span class="var">brd</span>, <span class="var">to</span>);<br/>
 <span class="in3"></span>}<br/>
-<span class="in3"></span>//<span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">" false} "</span>;<br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="num">false</span>;<br/>
 <span class="in2"></span>}<br/>
 <span class="in2"></span><span class="type">std</span>::<span class="type">string</span> <span class="fn">name</span>() <span class="type">const</span> <span class="keyword">override</span> {<br/>
@@ -797,7 +874,7 @@
 <span class="in2"></span><span class="type">bool</span> <span class="fn">can_move_to</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">to</span>) <span class="keyword">override</span> {<br/>
 <span class="in3"></span><span class="type">Piece</span> *<span class="var">to_piece</span> { <span class="var">brd</span>.<span class="fn">get</span>(<span class="var">to</span>) };<br/>
 <span class="in3"></span><span class="keyword">if</span> (<span class="fn">rank</span>() == <span class="num">2</span> &amp;&amp; <span class="var">to</span>.<span class="fn">rank</span>() == <span class="num">4</span>) {<br/>
-<span class="in4"></span><span class="keyword">return</span> <span class="fn">file</span>() == <span class="var">to</span>.<span class="fn">file</span>() &amp;&amp; ! <span class="var">to_piece</span>;<br/>
+<span class="in4"></span><span class="keyword">return</span> <span class="fn">file</span>() == <span class="var">to</span>.<span class="fn">file</span>() &amp;&amp; ! <span class="var">to_piece</span> &amp;&amp; ! <span class="var">brd</span>.<span class="fn">get</span>(*<span class="var">this</span> + <span class="type">Position</span> { <span class="num">0</span>, <span class="num">1</span>});<br/>
 <span class="in3"></span>} <span class="keyword">else</span> <span class="keyword">if</span> (<span class="fn">rank</span>() + <span class="num">1</span> == <span class="var">to</span>.<span class="fn">rank</span>()) {<br/>
 <span class="in4"></span><span class="keyword">if</span> (<span class="fn">file</span>() == <span class="var">to</span>.<span class="fn">file</span>()) {<br/>
 <span class="in5"></span><span class="keyword">return</span> ! <span class="var">to_piece</span>;<br/>
@@ -805,8 +882,10 @@
 <span class="in4"></span><span class="type">Position</span> <span class="var">sq</span> { (<span class="var">to</span> - *<span class="var">this</span>).<span class="fn">square</span>() };<br/>
 <span class="in4"></span><span class="keyword">if</span> (<span class="var">sq</span>.<span class="fn">file</span>() == <span class="num">1</span>) {<br/>
 <span class="in5"></span><span class="keyword">if</span> (<span class="var">to_piece</span>) { <span class="keyword">return</span> ! <span class="var">to_piece</span>-&gt;<span class="fn">white</span>(); }<br/>
-<span class="in5"></span><span class="type">Piece</span> *<span class="var">p</span> { <span class="var">brd</span>.<span class="fn">get</span>(<span class="var">to</span> + <span class="type">Position</span>{<span class="num">0</span>, <span class="num">1</span>}) };<br/>
-<span class="in5"></span><span class="keyword">return</span> <span class="var">p</span> &amp;&amp; ! <span class="var">p</span>-&gt;<span class="fn">white</span>() &amp;&amp; <span class="var">p</span>-&gt;<span class="fn">pawn</span>();<br/>
+<span class="in5"></span><span class="keyword">if</span> (<span class="fn">rank</span>() == <span class="num">5</span>) {<br/>
+<span class="in6"></span><span class="type">Piece</span> *<span class="var">p</span> { <span class="var">brd</span>.<span class="fn">get</span>(<span class="var">to</span> + <span class="type">Position</span>{<span class="num">0</span>, -<span class="num">1</span>}) };<br/>
+<span class="in6"></span><span class="keyword">return</span> <span class="var">p</span> &amp;&amp; ! <span class="var">p</span>-&gt;<span class="fn">white</span>() &amp;&amp; <span class="var">p</span>-&gt;<span class="fn">pawn</span>();<br/>
+<span class="in5"></span>}<br/>
 <span class="in4"></span>}<br/>
 <span class="in3"></span>}<br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="num">false</span>;<br/>
@@ -823,7 +902,7 @@
 <span class="in2"></span><span class="type">bool</span> <span class="fn">can_move_to</span>(<span class="type">Board</span> &amp;<span class="var">brd</span>, <span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">to</span>) <span class="keyword">override</span> {<br/>
 <span class="in3"></span><span class="type">Piece</span> *<span class="var">to_piece</span> { <span class="var">brd</span>.<span class="fn">get</span>(<span class="var">to</span>) };<br/>
 <span class="in3"></span><span class="keyword">if</span> (<span class="fn">rank</span>() == <span class="num">7</span> &amp;&amp; <span class="var">to</span>.<span class="fn">rank</span>() == <span class="num">5</span>) {<br/>
-<span class="in4"></span><span class="keyword">return</span> <span class="fn">file</span>() == <span class="var">to</span>.<span class="fn">file</span>() &amp;&amp; ! <span class="var">to_piece</span>;<br/>
+<span class="in4"></span><span class="keyword">return</span> <span class="fn">file</span>() == <span class="var">to</span>.<span class="fn">file</span>() &amp;&amp; ! <span class="var">to_piece</span> &amp;&amp; ! <span class="var">brd</span>.<span class="fn">get</span>(*<span class="var">this</span> + <span class="type">Position</span> { <span class="num">0</span>, -<span class="num">1</span> });<br/>
 <span class="in3"></span>} <span class="keyword">else</span> <span class="keyword">if</span> (<span class="fn">rank</span>() - <span class="num">1</span> == <span class="var">to</span>) {<br/>
 <span class="in4"></span><span class="keyword">if</span> (<span class="fn">file</span>() == <span class="var">to</span>.<span class="fn">file</span>()) {<br/>
 <span class="in5"></span><span class="keyword">return</span> ! <span class="var">to_piece</span>;<br/>
@@ -831,8 +910,10 @@
 <span class="in4"></span><span class="type">Position</span> <span class="var">sq</span> { (<span class="var">to</span> - *<span class="var">this</span>).<span class="fn">square</span>() };<br/>
 <span class="in4"></span><span class="keyword">if</span> (<span class="var">sq</span>.<span class="fn">file</span>() == <span class="num">1</span>) {<br/>
 <span class="in5"></span><span class="keyword">if</span> (<span class="var">to_piece</span>) { <span class="keyword">return</span> <span class="var">to_piece</span>-&gt;<span class="fn">white</span>(); }<br/>
-<span class="in5"></span><span class="type">Piece</span> *<span class="var">p</span> { <span class="var">brd</span>.<span class="fn">get</span>(<span class="var">to</span> + <span class="type">Position</span>{<span class="num">0</span>, -<span class="num">1</span>}) };<br/>
-<span class="in5"></span><span class="keyword">return</span> <span class="var">p</span> &amp;&amp; <span class="var">p</span>-&gt;<span class="fn">white</span>() &amp;&amp; <span class="var">p</span>-&gt;<span class="fn">pawn</span>();<br/>
+<span class="in5"></span><span class="keyword">if</span> (<span class="fn">rank</span>() == <span class="num">4</span>) {<br/>
+<span class="in6"></span><span class="type">Piece</span> *<span class="var">p</span> { <span class="var">brd</span>.<span class="fn">get</span>(<span class="var">to</span> + <span class="type">Position</span>{<span class="num">0</span>, <span class="num">1</span>}) };<br/>
+<span class="in6"></span><span class="keyword">return</span> <span class="var">p</span> &amp;&amp; <span class="var">p</span>-&gt;<span class="fn">white</span>() &amp;&amp; <span class="var">p</span>-&gt;<span class="fn">pawn</span>();<br/>
+<span class="in5"></span>}<br/>
 <span class="in4"></span>}<br/>
 <span class="in3"></span>}<br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="num">false</span>;<br/>
@@ -1007,6 +1088,10 @@
 <span class="macro">@end(<span class="name">unit-tests</span>)</span><br/>
 </code></div>
 </div>
+</div>
+<p>	 <code></code><code> <span class="macro">@add(<span class="name">unit-tests</span>)</span> 	<span class="keyword">for</span> (<span class="type">int</span> <span class="var">f</span> { <span class="num">1</span> }; <span class="var">f</span> &lt;= <span class="num">8</span>; ++<span class="var">f</span>) { 		<span class="keyword">if</span> (! <span class="var">brd</span>.<span class="fn">get</span>(<span class="type">Position</span> { <span class="var">f</span>, <span class="num">1</span> }) || ! <span class="var">brd</span>.<span class="fn">get</span>(<span class="type">Position</span> { <span class="var">f</span>, <span class="num">1</span> })-&gt;<span class="fn">white</span>()) { 			<span class="fn">fail</span>(<span class="str">"not white on "</span> + (<span class="type">std</span>::<span class="type">string</span>) <span class="type">Position</span> { <span class="var">f</span>, <span class="num">1</span> }); 		} 		<span class="keyword">if</span> (! <span class="var">brd</span>.<span class="fn">get</span>(<span class="type">Position</span> { <span class="var">f</span>, <span class="num">2</span> }) || ! <span class="var">brd</span>.<span class="fn">get</span>(<span class="type">Position</span> { <span class="var">f</span>, <span class="num">2</span> })-&gt;<span class="fn">white</span>()) { 			<span class="fn">fail</span>(<span class="str">"not white on "</span> + (<span class="type">std</span>::<span class="type">string</span>) <span class="type">Position</span> { <span class="var">f</span>, <span class="num">2</span> }); 		} 		<span class="keyword">if</span> (! <span class="var">brd</span>.<span class="fn">get</span>(<span class="type">Position</span> { <span class="var">f</span>, <span class="num">7</span> }) || <span class="var">brd</span>.<span class="fn">get</span>(<span class="type">Position</span> { <span class="var">f</span>, <span class="num">7</span> })-&gt;<span class="fn">white</span>()) { 			<span class="fn">fail</span>(<span class="str">"no black on "</span> + (<span class="type">std</span>::<span class="type">string</span>) <span class="type">Position</span> { <span class="var">f</span>, <span class="num">7</span> }); 		} 		<span class="keyword">if</span> (! <span class="var">brd</span>.<span class="fn">get</span>(<span class="type">Position</span> { <span class="var">f</span>, <span class="num">8</span> }) || <span class="var">brd</span>.<span class="fn">get</span>(<span class="type">Position</span> { <span class="var">f</span>, <span class="num">8</span> })-&gt;<span class="fn">white</span>()) { 			<span class="fn">fail</span>(<span class="str">"no black on "</span> + (<span class="type">std</span>::<span class="type">string</span>) <span class="type">Position</span> { <span class="var">f</span>, <span class="num">8</span> }); 		} 		<span class="keyword">for</span> (<span class="type">int</span> <span class="var">r</span> { <span class="num">3</span> }; <span class="var">r</span> &lt;= <span class="num">6</span>; ++<span class="var">r</span>) { 			<span class="keyword">if</span> (<span class="var">brd</span>.<span class="fn">get</span>(<span class="type">Position</span> { <span class="var">f</span>, <span class="var">r</span> })) { 				<span class="fn">fail</span>(<span class="str">"not empty on "</span> + (<span class="type">std</span>::<span class="type">string</span>) <span class="type">Position</span> { <span class="var">f</span>, <span class="var">r</span> }); 			} 		} 	} <span class="macro">@end(<span class="name">unit-tests</span>)</span> </code><code></code>
+</p>
+<div class="slides">
 <div class="page"><div class="slide"><div class="slide-nr">32</div>
 <code>
 <span class="macro">@add(<span class="name">globals</span>)</span><br/>
@@ -1241,7 +1326,7 @@
 <span class="in2"></span><span class="keyword">if</span> (! (<span class="var">nr</span> &amp; <span class="num">1</span>)) {<br/>
 <span class="in3"></span><span class="var">out</span> &lt;&lt; (<span class="num">1</span> + (<span class="var">nr</span> &gt;&gt; <span class="num">1</span>)) &lt;&lt; <span class="str">". "</span>;<br/>
 <span class="in2"></span>}<br/>
-<span class="in2"></span>//<span class="var">out</span> &lt;&lt; <span class="str">'{'</span> &lt;&lt; <span class="type">std</span>::<span class="var">hex</span> &lt;&lt; <span class="var">ch</span> &lt;&lt; <span class="type">std</span>::<span class="var">dec</span> &lt;&lt; <span class="str">"} "</span>;<br/>
+<span class="in2"></span>// <span class="var">out</span> &lt;&lt; <span class="str">'{'</span> &lt;&lt; <span class="type">std</span>::<span class="var">hex</span> &lt;&lt; <span class="var">ch</span> &lt;&lt; <span class="type">std</span>::<span class="var">dec</span> &lt;&lt; <span class="str">"} "</span>;<br/>
 <br/>
 <span class="in2"></span><span class="keyword">switch</span> (<span class="var">ch</span>) {<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x00</span>:<br/>
