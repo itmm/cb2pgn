@@ -149,9 +149,7 @@
 <div class="page"><div class="slide"><div class="slide-nr">13</div>
 <code>
 <span class="macro">@add(<span class="name">main</span>)</span><br/>
-<span class="in1"></span><span class="keyword">if</span> (<span class="var">count</span> == <span class="num">0</span>) {<br/>
-<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"DONE\n"</span>;<br/>
-<span class="in1"></span>} <span class="keyword">else</span> <span class="keyword">if</span> (<span class="var">count</span> &gt; <span class="num">0</span>) {<br/>
+<span class="in1"></span><span class="keyword">if</span> (<span class="var">count</span> &gt; <span class="num">0</span>) {<br/>
 <span class="in2"></span><span class="fn">fail</span>(<span class="str">"missing"</span> + <span class="fn">to_str</span>(<span class="var">count</span>) + <span class="str">" games"</span>);<br/>
 <span class="in1"></span>} <span class="keyword">else</span> {<br/>
 <span class="in2"></span><span class="fn">fail</span>(<span class="fn">to_str</span>(-<span class="var">count</span>) + <span class="str">" surplus games"</span>);<br/>
@@ -695,6 +693,14 @@
 <span class="in2"></span><span class="type">std</span>::<span class="var">unique_ptr</span>&lt;<span class="type">Piece</span>&gt; <span class="var">bishops</span>;<br/>
 <span class="in2"></span><span class="type">std</span>::<span class="var">unique_ptr</span>&lt;<span class="type">Piece</span>&gt; <span class="var">knights</span>;<br/>
 <span class="in2"></span><span class="type">std</span>::<span class="var">unique_ptr</span>&lt;<span class="type">Piece</span>&gt; <span class="var">pawns</span>;<br/>
+<span class="in2"></span><span class="type">void</span> <span class="fn">clear</span>() {<br/>
+<span class="in3"></span><span class="var">king</span>.<span class="fn">reset</span>();<br/>
+<span class="in3"></span><span class="var">queens</span>.<span class="fn">reset</span>();<br/>
+<span class="in3"></span><span class="var">rooks</span>.<span class="fn">reset</span>();<br/>
+<span class="in3"></span><span class="var">bishops</span>.<span class="fn">reset</span>();<br/>
+<span class="in3"></span><span class="var">knights</span>.<span class="fn">reset</span>();<br/>
+<span class="in3"></span><span class="var">pawns</span>.<span class="fn">reset</span>();<br/>
+<span class="in2"></span>}<br/>
 <span class="in2"></span><span class="type">Piece</span> *<span class="fn">find</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>) {<br/>
 <span class="in3"></span><span class="type">Piece</span> *<span class="var">r</span> = <span class="var">king</span>.<span class="fn">get</span>() ? <span class="var">king</span>.<span class="fn">get</span>()-&gt;<span class="fn">find</span>(<span class="var">pos</span>) : <span class="num">nullptr</span>;<br/>
 <span class="in3"></span><span class="keyword">if</span> (<span class="var">r</span>) { <span class="keyword">return</span> <span class="var">r</span>; }<br/>
@@ -725,7 +731,7 @@
 <span class="in3"></span><span class="keyword">if</span> (<span class="var">knights</span> &amp;&amp; <span class="var">knights</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="var">verbose</span>)) {<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="num">true</span>;<br/>
 <span class="in3"></span>}<br/>
-<span class="in3"></span><span class="keyword">return</span> <span class="var">pawns</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="var">verbose</span>);<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">pawns</span> &amp;&amp; <span class="var">pawns</span>-&gt;<span class="fn">any_attacks</span>(<span class="var">brd</span>, <span class="var">p</span>, <span class="var">verbose</span>);<br/>
 <span class="in2"></span>}<br/>
 <span class="in2"></span><span class="type">bool</span> <span class="fn">remove_inner</span>(<span class="type">Piece</span> *<span class="var">p</span>, <span class="type">Piece</span> *<span class="var">prev</span>) {<br/>
 <span class="in3"></span><span class="keyword">while</span> (<span class="var">prev</span>) {<br/>
@@ -864,10 +870,12 @@
 <span class="in4"></span><span class="fn">fail</span>(<span class="str">"can't remove piece "</span> + <span class="var">name</span>);<br/>
 <span class="in3"></span>}<br/>
 <span class="in2"></span>}<br/>
-<span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_queen</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>);<br/>
-<span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_rook</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>);<br/>
-<span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_bishop</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>);<br/>
-<span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_knight</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>);<br/>
+<span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_king</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span> = <span class="num">false</span>);<br/>
+<span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_queen</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span> = <span class="num">false</span>);<br/>
+<span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_rook</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span> = <span class="num">false</span>);<br/>
+<span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_bishop</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span> = <span class="num">false</span>);<br/>
+<span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_knight</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span> = <span class="num">false</span>);<br/>
+<span class="in2"></span><span class="type">Piece</span> *<span class="fn">add_pawn</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span> = <span class="num">false</span>);<br/>
 <span class="in2"></span><span class="type">Piece</span> *<span class="fn">first</span>(<span class="type">const</span> <span class="type">Piece</span> &amp;<span class="var">p</span>) {<br/>
 <span class="in3"></span><span class="keyword">if</span> (<span class="var">p</span>.<span class="fn">name</span>() == <span class="str">""</span>) {<br/>
 <span class="in4"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="var">pawns</span>.<span class="fn">get</span>();<br/>
@@ -885,6 +893,12 @@
 <span class="in4"></span><span class="fn">fail</span>(<span class="str">"uknown name "</span> + <span class="var">p</span>.<span class="fn">name</span>());<br/>
 <span class="in3"></span>}<br/>
 <span class="in3"></span><span class="keyword">return</span> <span class="num">nullptr</span>;<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="type">void</span> <span class="fn">clear</span>() {<br/>
+<span class="in3"></span><span class="var">white_</span>.<span class="fn">clear</span>();<br/>
+<span class="in3"></span><span class="var">black_</span>.<span class="fn">clear</span>();<br/>
+<span class="in3"></span><span class="var">cur_</span> = &amp;<span class="var">white_</span>;<br/>
+<span class="in3"></span><span class="var">other_</span> = &amp;<span class="var">black_</span>;<br/>
 <span class="in2"></span>}<br/>
 <span class="in1"></span>} <span class="var">brd</span>;<br/>
 <br/>
@@ -1181,18 +1195,47 @@
 <span class="in2"></span>}<br/>
 <span class="in1"></span>};<br/>
 <br/>
-<span class="in1"></span><span class="type">Piece</span> *<span class="type">Board</span>::<span class="fn">add_queen</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>) {<br/>
-<span class="in2"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Queen_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), <span class="fn">white</span>()), <span class="var">cur_</span>-&gt;<span class="var">queens</span>);<br/>
+<span class="in1"></span><span class="type">Piece</span> *<span class="type">Board</span>::<span class="fn">add_king</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span>) {<br/>
+<span class="in2"></span><span class="keyword">if</span> (<span class="var">other</span>) {<br/>
+<span class="in2"></span><span class="keyword">return</span> <span class="var">other_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">King_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), ! <span class="fn">white</span>()), <span class="var">other_</span>-&gt;<span class="var">king</span>);<br/>
+<span class="in2"></span>} <span class="keyword">else</span> {<br/>
+<span class="in2"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">King_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), <span class="fn">white</span>()), <span class="var">cur_</span>-&gt;<span class="var">king</span>);<br/>
+<span class="in2"></span>}<br/>
 <span class="in1"></span>}<br/>
-<br/>
-<span class="in1"></span><span class="type">Piece</span> *<span class="type">Board</span>::<span class="fn">add_rook</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>) {<br/>
-<span class="in2"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Rook_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), <span class="fn">white</span>()), <span class="var">cur_</span>-&gt;<span class="var">rooks</span>);<br/>
+<span class="in1"></span><span class="type">Piece</span> *<span class="type">Board</span>::<span class="fn">add_queen</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span>) {<br/>
+<span class="in2"></span><span class="keyword">if</span> (<span class="var">other</span>) {<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">other_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Queen_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), ! <span class="fn">white</span>()), <span class="var">other_</span>-&gt;<span class="var">queens</span>);<br/>
+<span class="in2"></span>} <span class="keyword">else</span> {<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Queen_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), <span class="fn">white</span>()), <span class="var">cur_</span>-&gt;<span class="var">queens</span>);<br/>
+<span class="in2"></span>}<br/>
 <span class="in1"></span>}<br/>
-<span class="in1"></span><span class="type">Piece</span> *<span class="type">Board</span>::<span class="fn">add_bishop</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>) {<br/>
-<span class="in2"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Bishop_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), <span class="fn">white</span>()), <span class="var">cur_</span>-&gt;<span class="var">bishops</span>);<br/>
+<span class="in1"></span><span class="type">Piece</span> *<span class="type">Board</span>::<span class="fn">add_rook</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span>) {<br/>
+<span class="in2"></span><span class="keyword">if</span> (<span class="var">other</span>) {<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">other_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Rook_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), ! <span class="fn">white</span>()), <span class="var">other_</span>-&gt;<span class="var">rooks</span>);<br/>
+<span class="in2"></span>} <span class="keyword">else</span> {<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Rook_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), <span class="fn">white</span>()), <span class="var">cur_</span>-&gt;<span class="var">rooks</span>);<br/>
+<span class="in2"></span>}<br/>
 <span class="in1"></span>}<br/>
-<span class="in1"></span><span class="type">Piece</span> *<span class="type">Board</span>::<span class="fn">add_knight</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>) {<br/>
-<span class="in2"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Knight_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), <span class="fn">white</span>()), <span class="var">cur_</span>-&gt;<span class="var">knights</span>);<br/>
+<span class="in1"></span><span class="type">Piece</span> *<span class="type">Board</span>::<span class="fn">add_bishop</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span>) {<br/>
+<span class="in2"></span><span class="keyword">if</span> (<span class="var">other</span>) {<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">other_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Bishop_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), ! <span class="fn">white</span>()), <span class="var">other_</span>-&gt;<span class="var">bishops</span>);<br/>
+<span class="in2"></span>} <span class="keyword">else</span> {<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Bishop_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), <span class="fn">white</span>()), <span class="var">cur_</span>-&gt;<span class="var">bishops</span>);<br/>
+<span class="in2"></span>}<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">Piece</span> *<span class="type">Board</span>::<span class="fn">add_knight</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span>) {<br/>
+<span class="in2"></span><span class="keyword">if</span> (<span class="var">other</span>) {<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">other_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Knight_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), ! <span class="fn">white</span>()), <span class="var">other_</span>-&gt;<span class="var">knights</span>);<br/>
+<span class="in2"></span>} <span class="keyword">else</span> {<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">add_piece</span>(<span class="keyword">new</span> <span class="fn">Knight_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>(), <span class="fn">white</span>()), <span class="var">cur_</span>-&gt;<span class="var">knights</span>);<br/>
+<span class="in2"></span>}<br/>
+<span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">Piece</span> *<span class="type">Board</span>::<span class="fn">add_pawn</span>(<span class="type">const</span> <span class="type">Position</span> &amp;<span class="var">pos</span>, <span class="type">bool</span> <span class="var">other</span>) {<br/>
+<span class="in2"></span><span class="keyword">if</span> (<span class="var">other</span>) {<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">other_</span>-&gt;<span class="fn">add_piece</span>(<span class="fn">white</span>() ? (<span class="type">Piece</span> *) <span class="keyword">new</span> <span class="fn">Black_Pawn_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>()): (<span class="type">Piece</span> *) <span class="keyword">new</span> <span class="fn">White_Pawn_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>()), <span class="var">other_</span>-&gt;<span class="var">pawns</span>);<br/>
+<span class="in2"></span>} <span class="keyword">else</span> {<br/>
+<span class="in3"></span><span class="keyword">return</span> <span class="var">cur_</span>-&gt;<span class="fn">add_piece</span>(<span class="fn">white</span>() ? (<span class="type">Piece</span> *) <span class="keyword">new</span> <span class="fn">White_Pawn_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>()): (<span class="type">Piece</span> *) <span class="keyword">new</span> <span class="fn">Black_Pawn_Piece</span>(<span class="var">pos</span>.<span class="fn">file</span>(), <span class="var">pos</span>.<span class="fn">rank</span>()), <span class="var">cur_</span>-&gt;<span class="var">pawns</span>);<br/>
+<span class="in2"></span>}<br/>
 <span class="in1"></span>}<br/>
 <br/>
 <span class="in1"></span><span class="type">Board</span>::<span class="fn">Board</span>() {<br/>
@@ -1532,11 +1575,117 @@
 <span class="in1"></span><span class="keyword">if</span> (<span class="var">len</span> &amp; <span class="num">0x80000000</span>) {<br/>
 <span class="in2"></span><span class="fn">fail</span>(<span class="str">"unknown game data of length "</span> + <span class="fn">to_str</span>(<span class="var">len</span>));<br/>
 <span class="in1"></span>}<br/>
+<span class="in1"></span><span class="type">bool</span> <span class="var">start_with_white</span> { <span class="num">true</span> };<br/>
 <span class="in1"></span><span class="keyword">if</span> (<span class="var">len</span> &amp; <span class="num">0x40000000</span>) {<br/>
 <span class="in2"></span><span class="var">len</span> &amp;= <span class="num">0x3fffffff</span>;<br/>
+<span class="in2"></span><span class="type">char</span> <span class="var">bd</span>[<span class="num">65</span>] { <span class="num">0</span> };<br/>
+<span class="in2"></span><span class="var">brd</span>.<span class="fn">clear</span>();<br/>
+<span class="in2"></span><span class="var">game_file</span>.<span class="fn">get</span>();<br/>
+<span class="in2"></span><span class="keyword">if</span> (<span class="var">game_file</span>.<span class="fn">get</span>() &amp; <span class="num">0x8</span>) {<br/>
+<span class="in3"></span><span class="var">start_with_white</span> = <span class="num">false</span>;<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="var">game_file</span>.<span class="fn">get</span>();<br/>
+<span class="in2"></span>/* <span class="type">int</span> <span class="var">move_nr</span> = */ <span class="var">game_file</span>.<span class="fn">get</span>();<br/>
+<span class="in2"></span><span class="type">int</span> <span class="var">value</span> { <span class="num">0</span> };<br/>
+<span class="in2"></span><span class="type">int</span> <span class="var">bits</span> { <span class="num">0</span> };<br/>
+<span class="in2"></span><span class="type">int</span> <span class="var">cnt</span> { <span class="num">0</span> };<br/>
+<span class="in2"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">f</span> { <span class="num">1</span> }; <span class="var">f</span> &lt;= <span class="num">8</span>; ++<span class="var">f</span>) {<br/>
+<span class="in3"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">r</span> { <span class="num">1</span> }; <span class="var">r</span> &lt;= <span class="num">8</span>; ++<span class="var">r</span>) {<br/>
+<span class="in4"></span><span class="keyword">if</span> (<span class="var">bits</span> &lt; <span class="num">1</span>) {<br/>
+<span class="in5"></span><span class="var">value</span> = (<span class="var">value</span> &lt;&lt; <span class="num">8</span>) | <span class="var">game_file</span>.<span class="fn">get</span>();<br/>
+<span class="in5"></span>++<span class="var">cnt</span>;<br/>
+<span class="in5"></span><span class="var">bits</span> += <span class="num">8</span>;<br/>
+<span class="in4"></span>}<br/>
+<span class="in4"></span><span class="keyword">if</span> (! ((<span class="var">value</span> &gt;&gt; (<span class="var">bits</span> - <span class="num">1</span>) &amp; <span class="num">0x1</span>))) {<br/>
+<span class="in5"></span>--<span class="var">bits</span>;<br/>
+<span class="in5"></span><span class="keyword">continue</span>;<br/>
+<span class="in4"></span>}<br/>
+<span class="in4"></span><span class="keyword">if</span> (<span class="var">bits</span> &lt; <span class="num">5</span>) {<br/>
+<span class="in5"></span><span class="var">value</span> = (<span class="var">value</span> &lt;&lt; <span class="num">8</span>) | <span class="var">game_file</span>.<span class="fn">get</span>();<br/>
+<span class="in5"></span><span class="var">bits</span> += <span class="num">8</span>;<br/>
+<span class="in5"></span>++<span class="var">cnt</span>;<br/>
+<span class="in4"></span>}<br/>
+<span class="in4"></span><span class="type">int</span> <span class="var">piece</span> { (<span class="var">value</span> &gt;&gt; (<span class="var">bits</span> - <span class="num">5</span>)) &amp; <span class="num">0x1f</span> };<br/>
+<span class="in4"></span><span class="var">value</span> = <span class="var">value</span> - (<span class="var">piece</span> &lt;&lt; (<span class="var">bits</span> - <span class="num">5</span>));<br/>
+<span class="in4"></span><span class="var">bits</span> -= <span class="num">5</span>;<br/>
+<span class="in4"></span><span class="type">int</span> <span class="var">idx</span> { (<span class="var">r</span> - <span class="num">1</span>) * <span class="num">8</span> + (<span class="var">f</span> - <span class="num">1</span>) };<br/>
+<span class="in4"></span><span class="type">Position</span> <span class="var">p</span> { <span class="var">f</span>, <span class="var">r</span> };<br/>
+<span class="in4"></span><span class="keyword">switch</span> (<span class="var">piece</span>) {<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x11</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'K'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_king</span>(<span class="var">p</span>, <span class="num">false</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x12</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'Q'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_queen</span>(<span class="var">p</span>, <span class="num">false</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x13</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'N'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_knight</span>(<span class="var">p</span>, <span class="num">false</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x14</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'B'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_bishop</span>(<span class="var">p</span>, <span class="num">false</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x15</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'R'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_rook</span>(<span class="var">p</span>, <span class="num">false</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x16</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'P'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_pawn</span>(<span class="var">p</span>, <span class="num">false</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x19</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'k'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_king</span>(<span class="var">p</span>, <span class="num">true</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x1a</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'q'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_queen</span>(<span class="var">p</span>, <span class="num">true</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x1b</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'n'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_knight</span>(<span class="var">p</span>, <span class="num">true</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x1c</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'b'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_bishop</span>(<span class="var">p</span>, <span class="num">true</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x1d</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'r'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_rook</span>(<span class="var">p</span>, <span class="num">true</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">case</span> <span class="num">0x1e</span>:<br/>
+<span class="in6"></span><span class="var">bd</span>[<span class="var">idx</span>] = <span class="str">'p'</span>;<br/>
+<span class="in6"></span><span class="var">brd</span>.<span class="fn">add_pawn</span>(<span class="var">p</span>, <span class="num">true</span>);<br/>
+<span class="in6"></span><span class="keyword">break</span>;<br/>
+<span class="in5"></span><span class="keyword">default</span>:<br/>
+<span class="in6"></span><span class="fn">fail</span>(<span class="str">"unknown setup piece "</span> + <span class="fn">to_str</span>(<span class="var">piece</span>));<br/>
+<span class="in4"></span>}<br/>
+<span class="in3"></span>}<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="keyword">for</span> (; <span class="var">cnt</span> &lt; <span class="num">24</span>; ++<span class="var">cnt</span>) { <span class="var">game_file</span>.<span class="fn">get</span>(); }<br/>
 <span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[SetUp \"1\"]\n"</span>;<br/>
-<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[FEN \"xx\"]\n"</span>;<br/>
-<span class="in2"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">i</span> { <span class="num">28</span> }; <span class="var">i</span>; --<span class="var">i</span>) { <span class="var">game_file</span>.<span class="fn">get</span>(); }<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"[FEN \""</span>;<br/>
+<span class="in2"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">r</span> { <span class="num">8</span> }; <span class="var">r</span> &gt;= <span class="num">1</span>; --<span class="var">r</span>) {<br/>
+<span class="in3"></span><span class="type">int</span> <span class="var">spaces</span> { <span class="num">0</span> };<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">r</span> &lt; <span class="num">8</span>) { <span class="type">std</span>::<span class="var">cout</span>.<span class="fn">put</span>(<span class="str">'/'</span>); }<br/>
+<span class="in3"></span><span class="keyword">for</span> (<span class="type">int</span> <span class="var">f</span> { <span class="num">1</span> }; <span class="var">f</span> &lt;= <span class="num">8</span>; ++<span class="var">f</span>) {<br/>
+<span class="in4"></span><span class="type">int</span> <span class="var">idx</span> { (<span class="var">r</span> - <span class="num">1</span>) * <span class="num">8</span> + (<span class="var">f</span> - <span class="num">1</span>) };<br/>
+<span class="in4"></span><span class="keyword">if</span> (<span class="var">bd</span>[<span class="var">idx</span>]) {<br/>
+<span class="in5"></span><span class="keyword">if</span> (<span class="var">spaces</span>) { <span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="var">spaces</span>; <span class="var">spaces</span> = <span class="num">0</span>; }<br/>
+<span class="in5"></span><span class="type">std</span>::<span class="var">cout</span>.<span class="fn">put</span>(<span class="var">bd</span>[<span class="var">idx</span>]);<br/>
+<span class="in4"></span>} <span class="keyword">else</span> {<br/>
+<span class="in5"></span>++<span class="var">spaces</span>;<br/>
+<span class="in4"></span>}<br/>
+<span class="in3"></span>}<br/>
+<span class="in3"></span><span class="keyword">if</span> (<span class="var">spaces</span>) { <span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="var">spaces</span>; }<br/>
+<span class="in2"></span>}<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">' '</span> &lt;&lt; (<span class="var">start_with_white</span> ? <span class="str">'w'</span> : <span class="str">'b'</span>);<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">"\"]\n"</span>;<br/>
+<span class="in2"></span><span class="keyword">if</span> (! <span class="var">start_with_white</span>) {<br/>
+<span class="in3"></span><span class="var">brd</span>.<span class="fn">switch_players</span>();<br/>
+<span class="in2"></span>}<br/>
 <span class="in1"></span>}<br/>
 <br/>
 <span class="keyword">static</span> <span class="var">short</span> <span class="type">MoveNumberLookup</span>[<span class="num">256</span>] = {<br/>
@@ -1584,7 +1733,7 @@
 <span class="in2"></span><span class="keyword">if</span> (! (<span class="var">nr</span> &amp; <span class="num">1</span>)) {<br/>
 <span class="in3"></span><span class="var">out</span> &lt;&lt; (<span class="num">1</span> + (<span class="var">nr</span> &gt;&gt; <span class="num">1</span>)) &lt;&lt; <span class="str">". "</span>;<br/>
 <span class="in2"></span>}<br/>
-<span class="in2"></span>// <span class="var">out</span> &lt;&lt; <span class="str">'{'</span> &lt;&lt; <span class="type">std</span>::<span class="var">hex</span> &lt;&lt; <span class="var">ch</span> &lt;&lt; <span class="type">std</span>::<span class="var">dec</span> &lt;&lt; <span class="str">"} "</span>;<br/>
+<span class="in2"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">'{'</span> &lt;&lt; <span class="type">std</span>::<span class="var">hex</span> &lt;&lt; <span class="var">ch</span> &lt;&lt; <span class="type">std</span>::<span class="var">dec</span> &lt;&lt; <span class="str">"} "</span>;<br/>
 <br/>
 <span class="in2"></span><span class="keyword">switch</span> (<span class="var">ch</span>) {<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x00</span>:<br/>
@@ -2083,6 +2232,10 @@
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0x9e</span>:<br/>
 <span class="in4"></span><span class="fn">move_pawn</span>(<span class="var">out</span>, <span class="num">6</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
+<span class="in3"></span><span class="keyword">case</span> <span class="num">0x9f</span>:<br/>
+<span class="in4"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">" {!!} "</span>;<br/>
+<span class="in4"></span>--<span class="var">count</span>; --<span class="var">nr</span>;<br/>
+<span class="in4"></span><span class="keyword">continue</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xa0</span>:<br/>
 <span class="in4"></span><span class="fn">move_queen</span>(<span class="var">out</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">3</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
@@ -2114,6 +2267,7 @@
 <span class="in4"></span><span class="fn">move_rook</span>(<span class="var">out</span>, <span class="num">2</span>, <span class="num">0</span>, <span class="num">2</span>);<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xaa</span>:<br/>
+<span class="in4"></span><span class="type">std</span>::<span class="var">cout</span> &lt;&lt; <span class="str">" {!!} "</span>;<br/>
 <span class="in4"></span><span class="keyword">break</span>;<br/>
 <span class="in3"></span><span class="keyword">case</span> <span class="num">0xab</span>:<br/>
 <span class="in4"></span><span class="fn">move_bishop</span>(<span class="var">out</span>, <span class="num">3</span>, <span class="num">1</span>, <span class="num">7</span>);<br/>
